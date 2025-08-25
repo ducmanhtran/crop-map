@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Bản đồ trồng trọt từ Google Sheets</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <style>
+    #map { height: 600px; width: 100%; }
+  </style>
+</head>
+<body>
+  <h2>Bản đồ trồng trọt (Demo Google Sheets)</h2>
+  <div id="map"></div>
+
+  <script>
+    // Khởi tạo bản đồ tại Quảng Bình
+    var map = L.map('map').setView([17.5, 106.62], 13);
+
+    // Thêm nền bản đồ
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Link JSON Google Sheets (demo)
+    var sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json
+";
+
+    // Gọi API
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(data => {
+        // Cắt bỏ ký tự thừa, parse thành JSON
+        var json = JSON.parse(data.substr(47).slice(0, -2));
+        var rows = json.table.rows;
+
+        rows.forEach(row => {
+          var name = row.c[0]?.v;   // Tên lô
+          var area = row.c[1]?.v;   // Diện tích
+          var crop = row.c[2]?.v;   // Cây trồng
+          var stage = row.c[3]?.v;  // Giai đoạn
+          var coords = JSON.parse(row.c[4]?.v); // Tọa độ (JSON)
+
+          // Màu theo giai đoạn
+          var color = "gray";
+          if (stage === "Gieo hạt") color = "yellow";
+          else if (stage === "Bón phân") color = "green";
+          else if (stage === "Thu hoạch") color = "orange";
+
+          // Vẽ polygon
+          var poly = L.polygon(coords, {
+            color: "black",
+            fillColor: color,
+            fillOpacity: 0.6
+          }).addTo(map);
+
+          poly.bindPopup(`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}`);
+        });
+      });
+  </script>
+</body>
+</html>
