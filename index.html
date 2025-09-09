@@ -45,9 +45,9 @@
 
           // Màu theo giai đoạn
           var color = "gray";
-          if (stage === "Gieo hạt") color = "yellow";
-          else if (stage === "Bón phân") color = "green";
-          else if (stage === "Thu hoạch") color = "orange";
+          if (crop === "Cỏ") color = "yellow";
+          else if (crop === "Sắn") color = "green";
+          else if (crop === "Ngô") color = "orange";
 
           // Vẽ polygon
           var poly = L.polygon(coords, {
@@ -63,6 +63,7 @@
   </script>
 </body>
 </html>
+
 
 
 
