@@ -9,41 +9,60 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
-  #map { height: 600px; width: 100%; }
+#map { height: 600px; width: 100%; }
 
-  #menu {
-    position: absolute;
-    top: 60px;      /* đẩy xuống dưới tiêu đề h2 */
-    left: 10px;
-    z-index: 1000;  /* đảm bảo nằm trên bản đồ */
-    background: white;
-    padding: 8px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    font-size: 14px;
-  }
+#menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;     /* chuyển sang góc phải */
+  z-index: 1000;
+  background: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  #menu select {
-    padding: 4px 8px;
-    font-size: 14px;
-  }
+#menu label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+#menu select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+#menu select:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #fff;
+}
+
 </style>
 
 </head>
 <body>
-  <h2>Bản đồ trồng trọt (Demo Google Sheets)</h2>
-  <div id="menu">
-    <label>Chế độ xem: </label>
-    <select id="viewMode">
-      <option value="all">Tổng thể</option>
-      <option value="Cỏ">Cỏ</option>
-      <option value="Sắn">Sắn</option>
-      <option value="Ngô">Ngô</option>
-      <option value="Đất trống">Đất trống</option>
-    </select>
-  </div>
-  <div id="map"></div>
-
+ <h2>Bản đồ trồng trọt (Demo Google Sheets)</h2>
+<div id="menu">
+  <label for="viewMode">Chế độ xem</label>
+  <select id="viewMode">
+    <option value="all">🌍 Tổng thể</option>
+    <option value="Cỏ">🌱 Cỏ</option>
+    <option value="Sắn">🥔 Sắn</option>
+    <option value="Ngô">🌽 Ngô</option>
+    <option value="Đất trống">⬜ Đất trống</option>
+  </select>
+</div>
+<div id="map"></div>
   <script>
     var map = L.map('map').setView([17.5089721, 106.4670833], 13);
 
@@ -130,4 +149,5 @@
   </script>
 </body>
 </html>
+
 
