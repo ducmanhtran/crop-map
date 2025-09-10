@@ -8,312 +8,283 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<style>
-/* Bản đồ chiếm phần còn lại */
-#map { 
-  height: calc(100vh - 100px);  /* chừa chỗ cho menu + footer */
-  width: 100%; 
-  margin: 0;
-  padding: 0;
-}
-
-/* Menu nằm trên bản đồ */
-/* Menu ngang */
-#menu {
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  position: relative;
-  z-index: 1000;
-}
-
-#menu .menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;        /* sắp ngang */
-  justify-content: center;
-}
-
-#menu .menu > li {
-  position: relative;
-}
-
-#menu button {
-  background: none;
-  border: none;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#menu button:hover {
-  background: #f0f0f0;
-}
-
-/* Submenu ẩn mặc định */
-#menu .submenu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: #fff;
-  list-style: none;
-  margin: 0;
-  padding: 4px 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  min-width: 180px;
-  z-index: 2000;
-}
-
-#menu .submenu li {
-  text-align: left;
-}
-
-#menu .submenu button {
-  width: 100%;
-  text-align: left;
-  padding: 8px 12px;
-  font-size: 13px;
-}
-
-/* Hiện submenu khi hover */
-#menu .menu > li:hover > .submenu {
-  display: block;
-}
-
-/* Responsive cho điện thoại */
-@media (max-width: 768px) {
-  #menu .menu {
-    flex-direction: column;   /* chuyển thành dọc */
-    align-items: stretch;
-  }
-
-  #menu .menu > li {
-    border-bottom: 1px solid #eee;
-  }
-
-  #menu button {
-    width: 100%;
-    text-align: left;
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  /* Submenu trong mobile */
-  #menu .submenu {
-    position: static;   /* bỏ absolute */
-    box-shadow: none;
-    min-width: 100%;
-  }
-
-  #menu .submenu button {
-    padding-left: 24px;  /* thụt vào để dễ nhìn */
-  }
-
-  /* Mặc định ẩn submenu trên mobile */
-  #menu .submenu {
-    display: none;
-  }
-
-  /* Khi li có class "open" thì hiện submenu */
-  #menu .menu > li.open > .submenu {
-    display: block;
-  }
-}
-
-
-</style>
-
-</head>
-<body>
-<!-- MENU NGANG DẠNG DROPDOWN -->
-<nav id="menu">
-  <ul class="menu">
-    <li>
-      <button>Cây trồng ▾</button>
-      <ul class="submenu">
-        <li><button data-crop="all">🌍 Tổng thể</button></li>
-        <li><button data-crop="Cỏ">🌱 Cỏ</button></li>
-        <li><button data-crop="Ngô">🌽 Ngô</button></li>
-        <li><button data-crop="Sắn">🥔 Sắn</button></li>
-        <li><button data-crop="Đất trống">⬜ Đất trống</button></li>
-      </ul>
-    </li>
-
-    <li>
-      <button>Công việc ▾</button>
-      <ul class="submenu">
-        <li><button data-task="daily">📅 Công việc hàng ngày</button></li>
-        <li><button data-task="note">📝 Lưu ý công việc</button></li>
-        <li><button data-task="weekly">📊 Báo cáo tuần</button></li>
-      </ul>
-    </li>
-
-    <li>
-      <button>Hạ tầng ▾</button>
-      <ul class="submenu">
-        <li><button data-infra="irrigation">💧 Hệ thống tưới</button></li>
-        <li><button data-infra="machine">🚜 Máy móc</button></li>
-      </ul>
-    </li>
-
-    <li>
-      <button>Pháp lý ▾</button>
-      <ul class="submenu">
-        <li><button data-legal="land">📖 Sổ đỏ</button></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-
-<h2 id="footerTitle">Bản đồ trồng trọt (Demo Google Sheets)</h2>
-
-  <script>
-    //var map = L.map('map').setView([17.5089721, 106.4670833], 13);
-    // Khởi tạo bản đồ, tắt zoomControl mặc định
-    var map = L.map('map', {
-      center: [17.5089721, 106.4670833],
-      zoom: 13,
-      zoomControl: false   // 👈 tắt mặc định
-    });
-
-// Thêm zoomControl mới ở vị trí khác
-L.control.zoom({
-  position: 'bottomright'   // có thể là 'bottomleft', 'bottomright', 'topleft', 'topright'
-}).addTo(map);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-// Bắt sự kiện click nút menu
-document.querySelectorAll("#menu button").forEach(btn => {
-  btn.addEventListener("click", function() {
-    // bỏ class active ở các nút khác
-    document.querySelectorAll("#menu button").forEach(b => b.classList.remove("active"));
-    this.classList.add("active");
-
-    // lấy giá trị crop
-    var crop = this.getAttribute("data-crop");
-    drawData(crop);
-  });
-});
-// Chỉ áp dụng cho mobile
-if (window.innerWidth <= 768) {
-  document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
-    btn.addEventListener("click", function(e) {
-      e.preventDefault();
-      var li = this.parentElement;
-
-      // Đóng các submenu khác
-      document.querySelectorAll("#menu .menu > li").forEach(item => {
-        if (item !== li) item.classList.remove("open");
-      });
-
-      // Toggle submenu hiện tại
-      li.classList.toggle("open");
-    });
-  });
-}
-
-// Khi load xong dữ liệu, đặt mặc định chọn "all"
-fetch(sheetUrl)
-  .then(res => res.text())
-  .then(data => {
-    var json = JSON.parse(data.substr(47).slice(0, -2));
-    rowsData = json.table.rows;
-    drawData("all");
-
-    // set nút mặc định
-    document.querySelector('#menu button[data-crop="all"]').classList.add("active");
-  });
-
-    var sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
-
-    var polygons = []; // lưu các polygon đã vẽ
-    var rowsData = []; // dữ liệu gốc từ sheets
-
-    // Hàm vẽ dữ liệu
-    function drawData(filterCrop) {
-      // Xoá các polygon cũ
-      polygons.forEach(p => map.removeLayer(p));
-      polygons = [];
-
-      rowsData.forEach(row => {
-        var name = row.c[0]?.v;
-        var area = row.c[1]?.v;
-        var crop = row.c[2]?.v;
-        var stage = row.c[3]?.v;
-        var coords = JSON.parse(row.c[5]?.v);
-        var harvestDateStr = row.c[4]?.v;
-
-        if (filterCrop !== "all" && crop !== filterCrop) return;
-
-        // Màu mặc định
-        var color = "gray";
-        var fillOpacity = 0.6;
-
-        if (crop === "Cỏ") {
-          color = "yellow";
-          if (harvestDateStr) {
-            var today = new Date();
-            var harvestDate = new Date(harvestDateStr);
-            var diffDays = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
-            var ratio = Math.min(Math.max(diffDays / 90, 0), 1);
-            fillOpacity = 0.2 + ratio * 0.6; // mờ -> đậm theo thời gian
-          }
-        } else if (crop === "Sắn") {
-          color = "green";
-        } else if (crop === "Ngô") {
-          color = "orange";
-        } else if (crop === "Đất trống") {
-          color = "brown";
-          fillOpacity = 0.3;
-        }
-
-        var poly = L.polygon(coords, {
-          color: "blue",
-          weight: 0.5,
-          fillColor: color,
-          fillOpacity: fillOpacity
-        }).addTo(map);
-
-        poly.bindPopup(`
-          <b>${name}</b><br>
-          Diện tích: ${area} ha<br>
-          Cây: ${crop}<br>
-          Giai đoạn: ${stage}<br>
-          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-        `);
-
-        polygons.push(poly);
-      });
+  <style>
+    /* Bản đồ chiếm phần còn lại */
+    #map { 
+      height: calc(100vh - 100px);
+      width: 100%; 
+      margin: 0;
+      padding: 0;
     }
 
-    // Lấy dữ liệu từ Google Sheets
-    fetch(sheetUrl)
-      .then(res => res.text())
-      .then(data => {
-        var json = JSON.parse(data.substr(47).slice(0, -2));
-        rowsData = json.table.rows;
-        drawData("all"); // mặc định load tất cả
+    /* MENU NGANG */
+    #menu {
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1000;
+    }
+
+    #menu .menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    #menu .menu > li {
+      position: relative;
+    }
+
+    #menu button {
+      background: none;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #menu button:hover {
+      background: #f0f0f0;
+    }
+
+    /* Submenu ẩn mặc định */
+    #menu .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      min-width: 180px;
+      z-index: 2000;
+    }
+
+    #menu .submenu li {
+      text-align: left;
+    }
+
+    #menu .submenu button {
+      width: 100%;
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    /* Hiện submenu khi hover (desktop) */
+    #menu .menu > li:hover > .submenu {
+      display: block;
+    }
+
+    /* Footer gọn hơn */
+    #footerTitle {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 4px 6px;
+      background: rgba(255,255,255,0.85);
+      text-align: center;
+      font-size: 13px;
+      font-weight: normal;
+      box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    /* Responsive cho điện thoại */
+    @media (max-width: 768px) {
+      #menu .menu {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      #menu .menu > li {
+        border-bottom: 1px solid #eee;
+      }
+
+      #menu button {
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      /* Submenu trong mobile */
+      #menu .submenu {
+        position: static;
+        box-shadow: none;
+        min-width: 100%;
+      }
+
+      #menu .submenu button {
+        padding-left: 24px;
+      }
+
+      /* Mặc định ẩn submenu trên mobile */
+      #menu .submenu {
+        display: none;
+      }
+
+      /* Khi li có class "open" thì hiện submenu */
+      #menu .menu > li.open > .submenu {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- MENU NGANG DẠNG DROPDOWN -->
+  <nav id="menu">
+    <ul class="menu">
+      <li>
+        <button>Cây trồng ▾</button>
+        <ul class="submenu">
+          <li><button data-crop="all">🌍 Tổng thể</button></li>
+          <li><button data-crop="Cỏ">🌱 Cỏ</button></li>
+          <li><button data-crop="Ngô">🌽 Ngô</button></li>
+          <li><button data-crop="Sắn">🥔 Sắn</button></li>
+          <li><button data-crop="Đất trống">⬜ Đất trống</button></li>
+        </ul>
+      </li>
+
+      <li>
+        <button>Công việc ▾</button>
+        <ul class="submenu">
+          <li><button data-task="daily">📅 Công việc hàng ngày</button></li>
+          <li><button data-task="note">📝 Lưu ý công việc</button></li>
+          <li><button data-task="weekly">📊 Báo cáo tuần</button></li>
+        </ul>
+      </li>
+
+      <li>
+        <button>Hạ tầng ▾</button>
+        <ul class="submenu">
+          <li><button data-infra="irrigation">💧 Hệ thống tưới</button></li>
+          <li><button data-infra="machine">🚜 Máy móc</button></li>
+        </ul>
+      </li>
+
+      <li>
+        <button>Pháp lý ▾</button>
+        <ul class="submenu">
+          <li><button data-legal="land">📖 Sổ đỏ</button></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <div id="map"></div>
+
+  <h2 id="footerTitle">Bản đồ trồng trọt (Demo Google Sheets)</h2>
+
+  <script>
+    window.onload = function() {
+      // --- Khai báo URL trước ---
+      var sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
+
+      var polygons = [];
+      var rowsData = [];
+
+      // --- Khởi tạo bản đồ ---
+      var map = L.map('map', {
+        center: [17.5089721, 106.4670833],
+        zoom: 13,
+        zoomControl: false
       });
 
-    // Bắt sự kiện chọn menu
-    document.getElementById("viewMode").addEventListener("change", function() {
-      var value = this.value;
-      drawData(value);
-    });
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      // --- Hàm vẽ dữ liệu ---
+      function drawData(filterCrop) {
+        polygons.forEach(p => map.removeLayer(p));
+        polygons = [];
+
+        rowsData.forEach(row => {
+          var name = row.c[0]?.v;
+          var area = row.c[1]?.v;
+          var crop = row.c[2]?.v;
+          var stage = row.c[3]?.v;
+          var coords = JSON.parse(row.c[5]?.v);
+          var harvestDateStr = row.c[4]?.v;
+
+          if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+
+          var color = "gray";
+          var fillOpacity = 0.6;
+
+          if (crop === "Cỏ") {
+            color = "yellow";
+          } else if (crop === "Sắn") {
+            color = "green";
+          } else if (crop === "Ngô") {
+            color = "orange";
+          } else if (crop === "Đất trống") {
+            color = "brown";
+            fillOpacity = 0.3;
+          }
+
+          var poly = L.polygon(coords, {
+            color: "blue",
+            weight: 0.5,
+            fillColor: color,
+            fillOpacity: fillOpacity
+          }).addTo(map);
+
+          poly.bindPopup(`
+            <b>${name}</b><br>
+            Diện tích: ${area} ha<br>
+            Cây: ${crop}<br>
+            Giai đoạn: ${stage}<br>
+            Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+          `);
+
+          polygons.push(poly);
+        });
+      }
+
+      // --- Lấy dữ liệu từ Google Sheets ---
+      fetch(sheetUrl)
+        .then(res => res.text())
+        .then(data => {
+          var json = JSON.parse(data.substr(47).slice(0, -2));
+          rowsData = json.table.rows;
+          drawData("all");
+        });
+
+      // --- Bắt sự kiện chọn crop ---
+      document.querySelectorAll("[data-crop]").forEach(btn => {
+        btn.addEventListener("click", function() {
+          var crop = this.getAttribute("data-crop");
+          drawData(crop);
+        });
+      });
+
+      // --- JS cho mobile menu ---
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
+          btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            var li = this.parentElement;
+
+            document.querySelectorAll("#menu .menu > li").forEach(item => {
+              if (item !== li) item.classList.remove("open");
+            });
+
+            li.classList.toggle("open");
+          });
+        });
+      }
+    };
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
