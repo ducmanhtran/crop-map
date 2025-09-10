@@ -8,19 +8,27 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <style>
-    #map { height: 600px; width: 100%; }
-    #menu {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: white;
-      padding: 5px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    }
-  </style>
+<style>
+  #map { height: 600px; width: 100%; }
+
+  #menu {
+    position: absolute;
+    top: 60px;      /* đẩy xuống dưới tiêu đề h2 */
+    left: 10px;
+    z-index: 1000;  /* đảm bảo nằm trên bản đồ */
+    background: white;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 14px;
+  }
+
+  #menu select {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+</style>
+
 </head>
 <body>
   <h2>Bản đồ trồng trọt (Demo Google Sheets)</h2>
@@ -122,3 +130,4 @@
   </script>
 </body>
 </html>
+
