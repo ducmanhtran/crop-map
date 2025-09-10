@@ -18,91 +18,154 @@
 }
 
 /* Menu nằm trên bản đồ */
+/* Menu ngang */
 #menu {
-  width: 100%;
-  text-align: center;
-  padding: 6px;
-  background: #ffffff;
+  background: #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   position: relative;
   z-index: 1000;
 }
 
+#menu .menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;        /* sắp ngang */
+  justify-content: center;
+}
+
+#menu .menu > li {
+  position: relative;
+}
+
 #menu button {
-  padding: 5px 10px;
-  margin: 2px;
+  background: none;
   border: none;
-  border-radius: 6px;
-  background-color: #f0f0f0;
-  cursor: pointer;
+  padding: 10px 16px;
   font-size: 14px;
-  transition: background 0.2s, transform 0.1s;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 #menu button:hover {
-  background-color: #e0e0e0;
+  background: #f0f0f0;
 }
 
-#menu button.active {
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
-}
-
-#menu button:active {
-  transform: scale(0.95);
-}
-
-/* Footer gọn hơn */
-#footerTitle {
-  position: fixed;
-  bottom: 0;
+/* Submenu ẩn mặc định */
+#menu .submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
   left: 0;
-  width: 100%;
+  background: #fff;
+  list-style: none;
   margin: 0;
-  padding: 4px 6px;   /* 👈 giảm padding */
-  background: rgba(255,255,255,0.85);
-  text-align: center;
-  font-size: 13px;    /* 👈 chữ nhỏ hơn */
-  font-weight: normal;
-  box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
-  z-index: 1000;
+  padding: 4px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  min-width: 180px;
+  z-index: 2000;
 }
-/* Responsive cho màn hình nhỏ (điện thoại) */
+
+#menu .submenu li {
+  text-align: left;
+}
+
+#menu .submenu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* Hiện submenu khi hover */
+#menu .menu > li:hover > .submenu {
+  display: block;
+}
+
+/* Responsive cho điện thoại */
 @media (max-width: 768px) {
-  #menu {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 4px;
-    padding: 4px;
+  #menu .menu {
+    flex-direction: column;   /* chuyển thành dọc */
+    align-items: stretch;
+  }
+
+  #menu .menu > li {
+    border-bottom: 1px solid #eee;
   }
 
   #menu button {
-    flex: 1 1 auto;       /* các nút tự co giãn */
-    font-size: 12px;      /* chữ nhỏ hơn */
-    padding: 4px 6px;     /* gọn lại */
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    font-size: 14px;
   }
 
-  #footerTitle {
-    font-size: 11px;      /* chữ nhỏ hơn nữa */
-    padding: 2px 4px;     /* giảm khoảng trắng */
+  /* Submenu trong mobile */
+  #menu .submenu {
+    position: static;   /* bỏ absolute */
+    box-shadow: none;
+    min-width: 100%;
+  }
+
+  #menu .submenu button {
+    padding-left: 24px;  /* thụt vào để dễ nhìn */
+  }
+
+  /* Mặc định ẩn submenu trên mobile */
+  #menu .submenu {
+    display: none;
+  }
+
+  /* Khi li có class "open" thì hiện submenu */
+  #menu .menu > li.open > .submenu {
+    display: block;
   }
 }
+
 
 </style>
 
 </head>
 <body>
-<div id="menu">
-  <button data-crop="all">🌍 Tổng thể</button>
-  <button data-crop="Cỏ">🌱 Cỏ</button>
-  <button data-crop="Sắn">🥔 Sắn</button>
-  <button data-crop="Ngô">🌽 Ngô</button>
-  <button data-crop="Đất trống">⬜ Đất trống</button>
-</div>
+<!-- MENU NGANG DẠNG DROPDOWN -->
+<nav id="menu">
+  <ul class="menu">
+    <li>
+      <button>Cây trồng ▾</button>
+      <ul class="submenu">
+        <li><button data-crop="all">🌍 Tổng thể</button></li>
+        <li><button data-crop="Cỏ">🌱 Cỏ</button></li>
+        <li><button data-crop="Ngô">🌽 Ngô</button></li>
+        <li><button data-crop="Sắn">🥔 Sắn</button></li>
+        <li><button data-crop="Đất trống">⬜ Đất trống</button></li>
+      </ul>
+    </li>
 
-<div id="map"></div>
+    <li>
+      <button>Công việc ▾</button>
+      <ul class="submenu">
+        <li><button data-task="daily">📅 Công việc hàng ngày</button></li>
+        <li><button data-task="note">📝 Lưu ý công việc</button></li>
+        <li><button data-task="weekly">📊 Báo cáo tuần</button></li>
+      </ul>
+    </li>
+
+    <li>
+      <button>Hạ tầng ▾</button>
+      <ul class="submenu">
+        <li><button data-infra="irrigation">💧 Hệ thống tưới</button></li>
+        <li><button data-infra="machine">🚜 Máy móc</button></li>
+      </ul>
+    </li>
+
+    <li>
+      <button>Pháp lý ▾</button>
+      <ul class="submenu">
+        <li><button data-legal="land">📖 Sổ đỏ</button></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
 
 <h2 id="footerTitle">Bản đồ trồng trọt (Demo Google Sheets)</h2>
 
@@ -134,6 +197,23 @@ document.querySelectorAll("#menu button").forEach(btn => {
     drawData(crop);
   });
 });
+// Chỉ áp dụng cho mobile
+if (window.innerWidth <= 768) {
+  document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      var li = this.parentElement;
+
+      // Đóng các submenu khác
+      document.querySelectorAll("#menu .menu > li").forEach(item => {
+        if (item !== li) item.classList.remove("open");
+      });
+
+      // Toggle submenu hiện tại
+      li.classList.toggle("open");
+    });
+  });
+}
 
 // Khi load xong dữ liệu, đặt mặc định chọn "all"
 fetch(sheetUrl)
@@ -226,6 +306,7 @@ fetch(sheetUrl)
   </script>
 </body>
 </html>
+
 
 
 
