@@ -9,24 +9,28 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
-#map { height: 600px; width: 100%; }
+/* Bản đồ chiếm phần còn lại */
+#map { 
+  height: calc(100vh - 100px);  /* chừa chỗ cho menu + footer */
+  width: 100%; 
+  margin: 0;
+  padding: 0;
+}
 
+/* Menu nằm trên bản đồ */
 #menu {
-  position: absolute;
-  top: 10px;
-  left: 10px;   /* menu ở góc trái */
+  width: 100%;
+  text-align: center;
+  padding: 6px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  position: relative;
   z-index: 1000;
-  background: white;
-  padding: 8px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
 }
 
 #menu button {
-  padding: 6px 10px;
+  padding: 5px 10px;
+  margin: 2px;
   border: none;
   border-radius: 6px;
   background-color: #f0f0f0;
@@ -48,6 +52,23 @@
 #menu button:active {
   transform: scale(0.95);
 }
+
+/* Footer gọn hơn */
+#footerTitle {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 4px 6px;   /* 👈 giảm padding */
+  background: rgba(255,255,255,0.85);
+  text-align: center;
+  font-size: 13px;    /* 👈 chữ nhỏ hơn */
+  font-weight: normal;
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
 </style>
 
 </head>
@@ -59,8 +80,11 @@
   <button data-crop="Ngô">🌽 Ngô</button>
   <button data-crop="Đất trống">⬜ Đất trống</button>
 </div>
+
 <div id="map"></div>
-  <h2 id="footerTitle">Bản đồ trồng trọt - Quảng Bình HP</h2>
+
+<h2 id="footerTitle">Bản đồ trồng trọt (Demo Google Sheets)</h2>
+
   <script>
     var map = L.map('map').setView([17.5089721, 106.4670833], 13);
 
@@ -171,6 +195,7 @@ fetch(sheetUrl)
   </script>
 </body>
 </html>
+
 
 
 
