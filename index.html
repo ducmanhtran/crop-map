@@ -68,6 +68,27 @@
   box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
   z-index: 1000;
 }
+/* Responsive cho màn hình nhỏ (điện thoại) */
+@media (max-width: 768px) {
+  #menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  #menu button {
+    flex: 1 1 auto;       /* các nút tự co giãn */
+    font-size: 12px;      /* chữ nhỏ hơn */
+    padding: 4px 6px;     /* gọn lại */
+  }
+
+  #footerTitle {
+    font-size: 11px;      /* chữ nhỏ hơn nữa */
+    padding: 2px 4px;     /* giảm khoảng trắng */
+  }
+}
 
 </style>
 
@@ -195,6 +216,7 @@ fetch(sheetUrl)
   </script>
 </body>
 </html>
+
 
 
 
