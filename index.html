@@ -10,64 +10,115 @@
 
   <style>
     #map { height: 600px; width: 100%; }
+    #menu {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 5px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
   <h2>Bản đồ trồng trọt (Demo Google Sheets)</h2>
+  <div id="menu">
+    <label>Chế độ xem: </label>
+    <select id="viewMode">
+      <option value="all">Tổng thể</option>
+      <option value="Cỏ">Cỏ</option>
+      <option value="Sắn">Sắn</option>
+      <option value="Ngô">Ngô</option>
+      <option value="Đất trống">Đất trống</option>
+    </select>
+  </div>
   <div id="map"></div>
 
   <script>
-    // Khởi tạo bản đồ tại Quảng Bình
     var map = L.map('map').setView([17.5089721, 106.4670833], 13);
 
-    // Thêm nền bản đồ
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Link JSON Google Sheets (demo)
     var sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
 
-    // Gọi API
+    var polygons = []; // lưu các polygon đã vẽ
+    var rowsData = []; // dữ liệu gốc từ sheets
+
+    // Hàm vẽ dữ liệu
+    function drawData(filterCrop) {
+      // Xoá các polygon cũ
+      polygons.forEach(p => map.removeLayer(p));
+      polygons = [];
+
+      rowsData.forEach(row => {
+        var name = row.c[0]?.v;
+        var area = row.c[1]?.v;
+        var crop = row.c[2]?.v;
+        var stage = row.c[3]?.v;
+        var coords = JSON.parse(row.c[5]?.v);
+        var harvestDateStr = row.c[4]?.v;
+
+        if (filterCrop !== "all" && crop !== filterCrop) return;
+
+        // Màu mặc định
+        var color = "gray";
+        var fillOpacity = 0.6;
+
+        if (crop === "Cỏ") {
+          color = "yellow";
+          if (harvestDateStr) {
+            var today = new Date();
+            var harvestDate = new Date(harvestDateStr);
+            var diffDays = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+            var ratio = Math.min(Math.max(diffDays / 90, 0), 1);
+            fillOpacity = 0.2 + ratio * 0.6; // mờ -> đậm theo thời gian
+          }
+        } else if (crop === "Sắn") {
+          color = "green";
+        } else if (crop === "Ngô") {
+          color = "orange";
+        } else if (crop === "Đất trống") {
+          color = "brown";
+          fillOpacity = 0.3;
+        }
+
+        var poly = L.polygon(coords, {
+          color: "blue",
+          weight: 0.5,
+          fillColor: color,
+          fillOpacity: fillOpacity
+        }).addTo(map);
+
+        poly.bindPopup(`
+          <b>${name}</b><br>
+          Diện tích: ${area} ha<br>
+          Cây: ${crop}<br>
+          Giai đoạn: ${stage}<br>
+          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+        `);
+
+        polygons.push(poly);
+      });
+    }
+
+    // Lấy dữ liệu từ Google Sheets
     fetch(sheetUrl)
       .then(res => res.text())
       .then(data => {
-        // Cắt bỏ ký tự thừa, parse thành JSON
         var json = JSON.parse(data.substr(47).slice(0, -2));
-        var rows = json.table.rows;
-
-        rows.forEach(row => {
-          var name = row.c[0]?.v;   // Tên lô
-          var area = row.c[1]?.v;   // Diện tích
-          var crop = row.c[2]?.v;   // Cây trồng
-          var stage = row.c[3]?.v;  // Giai đoạn
-          var coords = JSON.parse(row.c[5]?.v); // Tọa độ (JSON)
-
-          // Màu theo giai đoạn
-          var color = "gray";
-          if (crop === "Cỏ") color = "yellow";
-          else if (crop === "Sắn") color = "green";
-          else if (crop === "Ngô") color = "orange";
-          else if (crop === "Đất trống") color = "white";
-          // Vẽ polygon
-          var poly = L.polygon(coords, {
-            color: "blue",
-            weight: .5,
-            fillColor: color,
-            fillOpacity: 0.6
-          }).addTo(map);
-
-          poly.bindPopup(`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}`);
-        });
+        rowsData = json.table.rows;
+        drawData("all"); // mặc định load tất cả
       });
+
+    // Bắt sự kiện chọn menu
+    document.getElementById("viewMode").addEventListener("change", function() {
+      var value = this.value;
+      drawData(value);
+    });
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
