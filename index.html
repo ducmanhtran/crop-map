@@ -41,14 +41,14 @@
           var area = row.c[1]?.v;   // Diện tích
           var crop = row.c[2]?.v;   // Cây trồng
           var stage = row.c[3]?.v;  // Giai đoạn
-          var coords = JSON.parse(row.c[4]?.v); // Tọa độ (JSON)
+          var coords = JSON.parse(row.c[5]?.v); // Tọa độ (JSON)
 
           // Màu theo giai đoạn
           var color = "gray";
           if (crop === "Cỏ") color = "yellow";
           else if (crop === "Sắn") color = "green";
           else if (crop === "Ngô") color = "orange";
-
+          else if (crop === "Đất trống") color = "white";
           // Vẽ polygon
           var poly = L.polygon(coords, {
             color: "blue",
@@ -63,6 +63,7 @@
   </script>
 </body>
 </html>
+
 
 
 
