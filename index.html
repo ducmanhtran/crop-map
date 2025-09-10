@@ -107,8 +107,18 @@
 <h2 id="footerTitle">Bản đồ trồng trọt (Demo Google Sheets)</h2>
 
   <script>
-    var map = L.map('map').setView([17.5089721, 106.4670833], 13);
+    //var map = L.map('map').setView([17.5089721, 106.4670833], 13);
+    // Khởi tạo bản đồ, tắt zoomControl mặc định
+    var map = L.map('map', {
+      center: [17.5089721, 106.4670833],
+      zoom: 13,
+      zoomControl: false   // 👈 tắt mặc định
+    });
 
+// Thêm zoomControl mới ở vị trí khác
+L.control.zoom({
+  position: 'bottomright'   // có thể là 'bottomleft', 'bottomright', 'topleft', 'topright'
+}).addTo(map);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
@@ -216,6 +226,7 @@ fetch(sheetUrl)
   </script>
 </body>
 </html>
+
 
 
 
