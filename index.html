@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Bản đồ trồng trọt từ Google Sheets</title>
+  <title>Bản đồ trồng trọt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet -->
@@ -87,6 +87,7 @@
       padding: 16px 10px;
       font-size: 15px;
       text-align: center;
+      color: #000; /* chữ đen cho mobile */
     }
     #menu button i {
       display: block;
@@ -131,16 +132,6 @@
     font-size: 13px;
     box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
     z-index: 1000;
-  }
-
-  /* ===== LABEL ===== */
-  .custom-label {
-    font-weight: 600;
-    font-size: 13px;
-    color: #000;
-    text-align: center;
-    white-space: nowrap;
-    text-shadow: 1px 1px 2px #fff;
   }
   </style>
 </head>
@@ -193,6 +184,34 @@
     let polygons = [];
     let rowsData = [];
 
+    // Parse ngày từ Google Sheets
+    function parseDate_fromSheet(str) {
+      if (!str) return null;
+      str = String(str).trim();
+
+      // Nếu dạng dd/mm/yyyy
+      if (str.includes("/")) {
+        const parts = str.split("/");
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+          return new Date(year, month, day);
+        }
+      }
+
+      // Nếu dạng Date(YYYY,MM,DD)
+      const match = str.match(/Date\((\d+),(\d+),(\d+)\)/);
+      if (match) {
+        const year = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10); // JS tháng 0-11
+        const day = parseInt(match[3], 10);
+        return new Date(year, month, day);
+      }
+
+      return null;
+    }
+
     // Khởi tạo bản đồ
     const map = L.map('map', {
       center: [17.5089721, 106.4670833],
@@ -204,142 +223,59 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Nhãn
-    const labelsLayer = L.layerGroup().addTo(map);
-    let showLabels = false;
-
-    function drawLabels() {
-      labelsLayer.clearLayers();
-      if (!showLabels) return;
-      rowsData.forEach(row => {
-        const name = row.c[0]?.v;
-        const area = row.c[1]?.v;
-        const coords = JSON.parse(row.c[5]?.v);
-        if (!coords || coords.length === 0) return;
-        const poly = L.polygon(coords);
-        const center = poly.getBounds().getCenter();
-        L.marker(center, {
-          icon: L.divIcon({
-            className: "custom-label",
-            html: `<div><b>${name}</b><br>${area} ha</div>`
-          })
-        }).addTo(labelsLayer);
-      });
-    }
-
-    // Nút toggle nhãn
-    const toggleBtn = L.control({position: 'topright'});
-    toggleBtn.onAdd = function () {
-      const btn = L.DomUtil.create('button', 'toggle-labels-btn');
-      btn.innerHTML = "👁️ Hiện nhãn";
-      btn.style.background = "#fff";
-      btn.style.border = "1px solid #ccc";
-      btn.style.padding = "6px 10px";
-      btn.style.cursor = "pointer";
-      btn.style.borderRadius = "4px";
-      btn.onclick = function() {
-        showLabels = !showLabels;
-        btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
-        drawLabels();
-      };
-      return btn;
-    };
-    toggleBtn.addTo(map);
-
-    // Parse ngày dd/mm/yyyy
-      // Parse ngày từ Google Sheets
-    function parseDate_fromSheet(str) {
-      if (!str) return null;
-      str = String(str).trim();
-    
-      // Nếu dạng dd/mm/yyyy
-      if (str.includes("/")) {
-        const parts = str.split("/");
-        if (parts.length === 3) {
-          const day = parseInt(parts[0], 10);
-          const month = parseInt(parts[1], 10) - 1;
-          const year = parseInt(parts[2], 10);
-          return new Date(year, month, day);
-        }
-      }
-    
-      // Nếu dạng Date(YYYY,MM,DD)
-      const match = str.match(/Date\((\d+),(\d+),(\d+)\)/);
-      if (match) {
-        const year = parseInt(match[1], 10);
-        const month = parseInt(match[2], 10); // ở đây đã là chuẩn JS, tháng 0-11
-        const day = parse
-
-
     // Vẽ dữ liệu
     function drawData(filterCrop) {
       polygons.forEach(p => map.removeLayer(p));
       polygons = [];
-
       rowsData.forEach(row => {
-        const id = row.c[0]?.v;
+        const name = row.c[0]?.v;
         const area = row.c[1]?.v;
         const crop = row.c[2]?.v;
         const stage = row.c[3]?.v;
         const harvestDateStr = row.c[4]?.v;
         const coords = JSON.parse(row.c[5]?.v);
-
         if (!coords) return;
         if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
 
-        let color = "blue";
-        let fillColor = "gray";
-        let fillOpacity = 0.6;
+        let color = "gray", fillOpacity = 0.6, weight = 0.5;
 
         if (crop === "Cỏ") {
-          fillColor = "yellow";
-          fillOpacity = 0.4;
-
-          if (harvestDateStr) {
-            const harvestDate = parseDate_fromSheet(harvestDateStr);
+          color = "green";
+          const harvestDate = parseDate_fromSheet(harvestDateStr);
+          if (harvestDate) {
             const today = new Date();
-
-            if (harvestDate) {
-              const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
-              if (!isNaN(diffDays)) {
-                let ratio = diffDays / 90;
-                fillOpacity = Math.max(0.1, Math.min(ratio, 1));
-                if (diffDays >= 90) {
-                  color = "red";
-                  fillOpacity = 1;
-                }
-              }
+            const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+            fillOpacity = Math.min(1, days / 90);
+            if (days >= 90) {
+              color = "red";
+              weight = 2;
             }
           }
-        } else if (crop === "Sắn") {
-          fillColor = "green";
         } else if (crop === "Ngô") {
-          fillColor = "orange";
+          color = "orange";
+        } else if (crop === "Sắn") {
+          color = "green";
         } else if (crop === "Đất trống") {
-          fillColor = "brown";
-          fillOpacity = 0.3;
+          color = "brown"; fillOpacity = 0.3;
         }
 
         const poly = L.polygon(coords, {
-          color,
-          weight: 1,
-          fillColor,
-          fillOpacity
+          color: color,
+          weight: weight,
+          fillColor: color,
+          fillOpacity: fillOpacity
         }).addTo(map);
 
-        let popupContent = `
-          <b>${id}</b><br>
+        poly.bindPopup(`
+          <b>${name}</b><br>
           Diện tích: ${area} ha<br>
           Cây: ${crop}<br>
           Giai đoạn: ${stage}<br>
           Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-        `;
-        poly.bindPopup(popupContent);
+        `);
 
         polygons.push(poly);
       });
-
-      drawLabels();
     }
 
     // Lấy dữ liệu từ Google Sheets
@@ -376,4 +312,3 @@
   </script>
 </body>
 </html>
-
