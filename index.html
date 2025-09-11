@@ -31,397 +31,8 @@
     border: none;
     padding: 14px 20px;
     font-size: 15px;
-    color: #fff;        /* chữ trắng */
-    font-weight: 600;   /* đậm hơn cho dễ nhìn */
-    cursor: pointer;
-    transition: background 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  #menu button:hover { background: rgba(0,0,0,0.05); color: #007bff; }
-  #menu .submenu {
-    display: none;
-    position: absolute;
-    top: 100%; left: 0;
-    background: #fff;
-    list-style: none;
-    margin: 0;
-    padding: 6px 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    min-width: 200px;
-    border-radius: 4px;
-  }
-  #menu .submenu li { text-align: left; }
-  #menu .submenu button {
-    width: 100%;
-    text-align: left;
-    padding: 10px 14px;
-    font-size: 14px;
-    color: #333;
-    background: none;
-    border: none;
-  }
-  #menu .submenu button:hover {
-    background: #f0f0f0;
-    color: #007bff;
-  }
-  #menu .menu > li:hover > .submenu { display: block; }
-
-  /* ===== MENU MOBILE ===== */
-  @media (max-width: 768px) {
-    #menu .menu {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 4px;
-      padding: 4px;
-    }
-    #menu .menu > li {
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 6px;
-      background: rgba(255,255,255,0.6);
-    }
-    #menu button {
-      width: 100%;
-      justify-content: center;
-      padding: 16px 10px;
-      font-size: 15px;
-      text-align: center;
-    }
-    #menu button i {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-    #menu .submenu {
-      display: none;
-      position: static;
-      box-shadow: none;
-      background: #fff;
-      margin-top: 2px;
-      border-radius: 4px;
-    }
-    #menu .submenu button {
-      text-align: left;
-      padding: 10px 14px;
-      font-size: 14px;
-      color: #333;
-    }
-    #menu .submenu button:hover {
-      background: #f0f0f0;
-      color: #007bff;
-    }
-    #menu .menu > li.open > .submenu { display: block; }
-  }
-
-  /* ===== MAP + FOOTER ===== */
-  #map {
-    height: calc(100vh - 100px);
-    width: 100%;
-    margin: 0; padding: 0;
-  }
-  #footerTitle {
-    position: fixed;
-    bottom: 0; left: 0;
-    width: 100%;
-    margin: 0;
-    padding: 4px 6px;
-    background: rgba(255,255,255,0.85);
-    text-align: center;
-    font-size: 13px;
-    box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
-    z-index: 1000;
-  }
-    /* Bỏ nền trắng mờ của nhãn */
-    .leaflet-tooltip {
-      background: transparent !important;   /* trong suốt */
-      border: none !important;              /* bỏ viền */
-      box-shadow: none !important;          /* bỏ bóng */
-      color: #000;                          /* màu chữ (bạn đổi tùy ý) */
-      font-weight: 600;                     /* đậm hơn */
-      font-size: 14px;                      /* cỡ chữ */
-      white-space: nowrap;                  /* giữ chữ trên 1 dòng nếu vừa */
-    }
-    
-    /* Nếu muốn chữ có viền đen mỏng để dễ đọc trên nền sáng */
-    .leaflet-tooltip::before,
-    .leaflet-tooltip::after {
-      display: none !important;
-    }
-    
-    .leaflet-tooltip {
-      text-shadow: 1px 1px 2px #fff;  /* viền sáng xung quanh chữ */
-    }
-    .custom-label {
-      font-weight: 100;
-      font-size: 13px;
-      color: #000;
-    }
-
-  </style>
-</head>
-<body>
-  <!-- MENU -->
-  <nav id="menu">
-    <ul class="menu">
-      <li>
-        <button>🌱 Cây trồng ▾</button>
-        <ul class="submenu">
-          <li><button data-crop="all">🌍 Tổng thể</button></li>
-          <li><button data-crop="Cỏ">🌱 Cỏ</button></li>
-          <li><button data-crop="Ngô">🌽 Ngô</button></li>
-          <li><button data-crop="Sắn">🥔 Sắn</button></li>
-          <li><button data-crop="Đất trống">⬜ Đất trống</button></li>
-        </ul>
-      </li>
-      <li>
-        <button>🛠️ Công việc ▾</button>
-        <ul class="submenu">
-          <li><button>📅 Công việc hàng ngày</button></li>
-          <li><button>📝 Lưu ý công việc</button></li>
-          <li><button>📊 Báo cáo tuần</button></li>
-        </ul>
-      </li>
-      <li>
-        <button>🏗️ Hạ tầng ▾</button>
-        <ul class="submenu">
-          <li><button>💧 Hệ thống tưới</button></li>
-          <li><button>🚜 Máy móc</button></li>
-        </ul>
-      </li>
-      <li>
-        <button>📜 Pháp lý ▾</button>
-        <ul class="submenu">
-          <li><button>📖 Sổ đỏ</button></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
-
-  <!-- MAP -->
-  <div id="map"></div>
-  <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
-
-  <script>
-  window.onload = function() {
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
-
-    let polygons = [];
-    let rowsData = [];
-
-    // Khởi tạo bản đồ
-    const map = L.map('map', {
-      center: [17.5089721, 106.4670833],
-      zoom: 13,
-      zoomControl: false
-    });
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Nhãn
-    const labelsLayer = L.layerGroup().addTo(map);
-    let showLabels = false;
-
-    function drawLabels() {
-      labelsLayer.clearLayers();
-      if (!showLabels) return;
-      rowsData.forEach(row => {
-        const name = row.c[0]?.v;
-        const area = row.c[1]?.v;
-        const coords = JSON.parse(row.c[5]?.v);
-        if (!coords || coords.length === 0) return;
-        const poly = L.polygon(coords);
-        const center = poly.getBounds().getCenter();
-        L.marker(center, {
-          icon: L.divIcon({
-            className: "custom-label",
-            html: `<div style="font-size:12px; color:#000; white-space: nowrap; text-align: center;">
-                     <div><b>${name}</b></div>
-                     <div>${area} ha</div>
-                   </div>`
-          })
-        }).addTo(labelsLayer);
-
-      });
-    }
-
-    // Nút toggle nhãn
-    const toggleBtn = L.control({position: 'topright'});
-    toggleBtn.onAdd = function () {
-      const btn = L.DomUtil.create('button', 'toggle-labels-btn');
-      btn.innerHTML = "👁️ Hiện nhãn";
-      btn.style.background = "#fff";
-      btn.style.border = "1px solid #ccc";
-      btn.style.padding = "6px 10px";
-      btn.style.cursor = "pointer";
-      btn.style.borderRadius = "4px";
-      btn.onclick = function() {
-        showLabels = !showLabels;
-        btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
-        drawLabels();
-      };
-      return btn;
-    };
-    toggleBtn.addTo(map);
-
-    // Vẽ dữ liệu
-    function drawData(filterCrop) {
-    // Xóa các polygon cũ
-    polygons.forEach(p => map.removeLayer(p));
-    polygons = [];
-  
-    rowsData.forEach(row => {
-      const name = row.c[0]?.v;
-      const area = row.c[1]?.v;
-      const crop = row.c[2]?.v;
-      const stage = row.c[3]?.v;
-      const coords = JSON.parse(row.c[5]?.v);
-      const harvestDateStr = row.c[4]?.v; // ngày thu hoạch thực tế (dd/mm/yyyy)
-  
-      if (!coords) return;
-      if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
-  
-      let color = "blue";        // viền mặc định
-      let fillColor = "gray";    // màu mặc định
-      let fillOpacity = 0.6;     // độ mờ mặc định
-  
-      // ======= Xử lý theo loại cây =======
-      if (crop === "Cỏ") {
-        fillColor = "yellow";
-        fillOpacity = 0.4; // mặc định vàng nhạt
-  
-        if (harvestDateStr) {
-          // parse dd/mm/yyyy -> Date
-          const parts = harvestDateStr.split("/");
-          if (parts.length === 3) {
-            const harvestDate = new Date(parts[2], parts[1] - 1, parts[0]);
-            const today = new Date();
-  
-            // số ngày kể từ lần thu hoạch gần nhất
-            const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
-  
-            if (!isNaN(diffDays)) {
-              // opacity tỷ lệ theo số ngày / 90 (min 0.1, max 1)
-              let ratio = diffDays / 90;
-              fillOpacity = Math.max(0.1, Math.min(ratio, 1));
-  
-              // nếu đã đủ 90 ngày mà chưa thu hoạch lại => viền đỏ
-              if (diffDays >= 90) {
-                color = "red";
-                fillOpacity = 1;
-              }
-            }
-          }
-        }
-      } else if (crop === "Sắn") {
-        fillColor = "green";
-      } else if (crop === "Ngô") {
-        fillColor = "orange";
-      } else if (crop === "Đất trống") {
-        fillColor = "brown";
-        fillOpacity = 0.3;
-      }
-  
-      // ======= Vẽ polygon =======
-      const poly = L.polygon(coords, {
-        color: color,
-        weight: 1,
-        fillColor: fillColor,
-        fillOpacity: fillOpacity
-      }).addTo(map);
-  
-      // popup thông tin
-      let popupContent = `
-        <b>${name}</b><br>
-        Diện tích: ${area} ha<br>
-        Cây: ${crop}<br>
-        Giai đoạn: ${stage}<br>
-        Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-      `;
-  
-      // nếu là cỏ thì thêm dòng số ngày đã qua
-      if (crop === "Cỏ" && harvestDateStr) {
-        const parts = harvestDateStr.split("/");
-        if (parts.length === 3) {
-          const harvestDate = new Date(parts[2], parts[1] - 1, parts[0]);
-          const today = new Date();
-          const diffDays = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
-          if (!isNaN(diffDays)) {
-            popupContent += `<br>Đã qua: ${diffDays} ngày`;
-          }
-        }
-      }
-  
-      poly.bindPopup(popupContent);
-  
-      polygons.push(poly);
-    });
-  
-    // vẽ lại nhãn nếu đang bật
-    drawLabels();
-  }
-
-
-    // Lấy dữ liệu từ Google Sheets
-    fetch(sheetUrl)
-      .then(res => res.text())
-      .then(data => {
-        const json = JSON.parse(data.substr(47).slice(0, -2));
-        rowsData = json.table.rows;
-        drawData("all");
-      });
-
-    // Chọn crop
-    document.querySelectorAll("[data-crop]").forEach(btn => {
-      btn.addEventListener("click", function() {
-        const crop = this.getAttribute("data-crop");
-        drawData(crop);
-      });
-    });
-
-    // Mobile menu
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
-        btn.addEventListener("click", function(e) {
-          e.preventDefault();
-          const li = this.parentElement;
-          document.queryS<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Bản đồ trồng trọt từ Google Sheets</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <style>
-  /* ===== MENU NGANG ===== */
-  #menu {
-    background: linear-gradient(90deg, #007bff, #0056b3);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    position: relative;
-    z-index: 1000;
-    font-family: Arial, sans-serif;
-  }
-  #menu .menu {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-  }
-  #menu .menu > li { position: relative; }
-  #menu button {
-    background: none;
-    border: none;
-    padding: 14px 20px;
-    font-size: 15px;
-    color: #fff;        /* chữ trắng */
-    font-weight: 600;   /* đậm hơn cho dễ nhìn */
+    color: #fff;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.3s;
     display: flex;
@@ -522,14 +133,14 @@
     z-index: 1000;
   }
 
-  /* ===== LABEL CHỮ TRẦN ===== */
+  /* ===== LABEL ===== */
   .custom-label {
     font-weight: 600;
     font-size: 13px;
     color: #000;
     text-align: center;
     white-space: nowrap;
-    text-shadow: 1px 1px 2px #fff; /* giúp chữ dễ đọc trên nền */
+    text-shadow: 1px 1px 2px #fff;
   }
   </style>
 </head>
@@ -635,90 +246,96 @@
     };
     toggleBtn.addTo(map);
 
-    // Vẽ dữ liệu
-    // Hàm parse chuỗi ngày dd/mm/yyyy thành đối tượng Date
+    // Parse ngày dd/mm/yyyy
     function parseDate_ddmmyyyy(str) {
       if (!str) return null;
       const parts = str.split("/");
       if (parts.length !== 3) return null;
       const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // tháng JS từ 0–11
+      const month = parseInt(parts[1], 10) - 1;
       const year = parseInt(parts[2], 10);
       return new Date(year, month, day);
     }
-    
-    // Hàm vẽ dữ liệu từ Google Sheets
+
+    // Vẽ dữ liệu
     function drawData(filterCrop) {
-  polygons.forEach(p => map.removeLayer(p));
-  polygons = [];
+      polygons.forEach(p => map.removeLayer(p));
+      polygons = [];
 
-  rowsData.forEach(row => {
-    const id = row.c[0]?.v;          // Mã lô
-    const area = row.c[1]?.v;        // Diện tích
-    const crop = row.c[2]?.v;        // Loại cây
-    const stage = row.c[3]?.v;       // Giai đoạn
-    const harvestDateStr = row.c[4]?.v; // Ngày thu hoạch (dd/mm/yyyy)
-    const coords = JSON.parse(row.c[5]?.v); // tọa độ polygon (mình giả sử lưu JSON trong sheet)
+      rowsData.forEach(row => {
+        const id = row.c[0]?.v;
+        const area = row.c[1]?.v;
+        const crop = row.c[2]?.v;
+        const stage = row.c[3]?.v;
+        const harvestDateStr = row.c[4]?.v;
+        const coords = JSON.parse(row.c[5]?.v);
 
-    if (!coords) return;
-    if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+        if (!coords) return;
+        if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
 
-    let color = "blue";
-    let fillColor = "gray";
-    let fillOpacity = 0.6;
+        let color = "blue";
+        let fillColor = "gray";
+        let fillOpacity = 0.6;
 
-    // === xử lý riêng cho cỏ ===
-    if (crop === "Cỏ") {
-      fillColor = "yellow";
-      fillOpacity = 0.4;
+        if (crop === "Cỏ") {
+          fillColor = "yellow";
+          fillOpacity = 0.4;
 
-      if (harvestDateStr) {
-        const harvestDate = parseDate_ddmmyyyy(harvestDateStr);
-        const today = new Date();
+          if (harvestDateStr) {
+            const harvestDate = parseDate_ddmmyyyy(harvestDateStr);
+            const today = new Date();
 
-        if (harvestDate) {
-          const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
-          if (!isNaN(diffDays)) {
-            let ratio = diffDays / 90;
-            fillOpacity = Math.max(0.1, Math.min(ratio, 1));
-            if (diffDays >= 90) {
-              color = "red";
-              fillOpacity = 1;
+            if (harvestDate) {
+              const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
+              if (!isNaN(diffDays)) {
+                let ratio = diffDays / 90;
+                fillOpacity = Math.max(0.1, Math.min(ratio, 1));
+                if (diffDays >= 90) {
+                  color = "red";
+                  fillOpacity = 1;
+                }
+              }
             }
           }
+        } else if (crop === "Sắn") {
+          fillColor = "green";
+        } else if (crop === "Ngô") {
+          fillColor = "orange";
+        } else if (crop === "Đất trống") {
+          fillColor = "brown";
+          fillOpacity = 0.3;
         }
-      }
-    } else if (crop === "Sắn") {
-      fillColor = "green";
-    } else if (crop === "Ngô") {
-      fillColor = "orange";
-    } else if (crop === "Đất trống") {
-      fillColor = "brown";
-      fillOpacity = 0.3;
+
+        const poly = L.polygon(coords, {
+          color,
+          weight: 1,
+          fillColor,
+          fillOpacity
+        }).addTo(map);
+
+        let popupContent = `
+          <b>${id}</b><br>
+          Diện tích: ${area} ha<br>
+          Cây: ${crop}<br>
+          Giai đoạn: ${stage}<br>
+          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+        `;
+        poly.bindPopup(popupContent);
+
+        polygons.push(poly);
+      });
+
+      drawLabels();
     }
 
-    const poly = L.polygon(coords, {
-      color,
-      weight: 1,
-      fillColor,
-      fillOpacity
-    }).addTo(map);
-
-    let popupContent = `
-      <b>${id}</b><br>
-      Diện tích: ${area} ha<br>
-      Cây: ${crop}<br>
-      Giai đoạn: ${stage}<br>
-      Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-    `;
-
-    poly.bindPopup(popupContent);
-    polygons.push(poly);
-  });
-
-  drawLabels();
-}
-
+    // Lấy dữ liệu từ Google Sheets
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(data => {
+        const json = JSON.parse(data.substr(47).slice(0, -2));
+        rowsData = json.table.rows;
+        drawData("all");
+      });
 
     // Chọn crop
     document.querySelectorAll("[data-crop]").forEach(btn => {
@@ -745,16 +362,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
