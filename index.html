@@ -146,7 +146,27 @@
     display: block;
   }
 }
+#map {
+  height: calc(100vh - 100px); /* chừa chỗ cho menu + footer */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
+#footerTitle {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 4px 6px;
+  background: rgba(255,255,255,0.85);
+  text-align: center;
+  font-size: 13px;
+  font-weight: normal;
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
   </style>
 </head>
 <body>
@@ -299,6 +319,7 @@
   </script>
 </body>
 </html>
+
 
 
 
