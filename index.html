@@ -93,36 +93,55 @@
 /* Responsive (Mobile) */
 @media (max-width: 768px) {
   #menu .menu {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 cột */
+    grid-gap: 4px;
+    padding: 4px;
   }
 
   #menu .menu > li {
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
   }
 
   #menu button {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
+    padding: 16px 10px;
+    font-size: 15px;
+    text-align: center;
   }
 
+  #menu button i {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  /* Submenu vẫn ẩn theo mặc định */
   #menu .submenu {
+    display: none;
     position: static;
     box-shadow: none;
-    min-width: 100%;
-    border-radius: 0;
+    background: #fff;
+    margin-top: 2px;
+    border-radius: 4px;
   }
 
   #menu .submenu button {
-    padding-left: 32px;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #333;
   }
 
-  /* Mặc định ẩn submenu */
-  #menu .submenu {
-    display: none;
+  #menu .submenu button:hover {
+    background: #f0f0f0;
+    color: #007bff;
   }
 
-  /* Bấm mở submenu */
+  /* Khi bấm vào thì mở submenu */
   #menu .menu > li.open > .submenu {
     display: block;
   }
@@ -280,5 +299,6 @@
   </script>
 </body>
 </html>
+
 
 
