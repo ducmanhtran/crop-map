@@ -285,68 +285,93 @@
     toggleBtn.addTo(map);
     // Vẽ dữ liệu
     function drawData(filterCrop) {
-      polygons.forEach(p => map.removeLayer(p));
-      polygons = [];
-
-      rowsData.forEach(row => {
-        const name = row.c[0]?.v;
-        const area = row.c[1]?.v;
-        const crop = row.c[2]?.v;
-        const stage = row.c[3]?.v;
-        const harvestDateStr = row.c[4]?.v;
-        const coords = JSON.parse(row.c[5]?.v);
-        if (!coords) return;
-        if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
-
-        let color = "blue", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
+    polygons.forEach(p => map.removeLayer(p));
+    polygons = [];
+  
+    rowsData.forEach(row => {
+      const name = row.c[0]?.v;
+      const area = row.c[1]?.v;
+      const crop = row.c[2]?.v;
+      const stage = row.c[3]?.v;
+      const harvestDateStr = row.c[4]?.v;
+      const coords = JSON.parse(row.c[5]?.v);
+      if (!coords) return;
+  
+      // Nếu có filter thì áp dụng
+      if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+  
+      let color = "blue", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
+  
+      // --- Trường hợp xem Tổng thể ---
+      if (filterCrop === "all") {
         if (crop === "Cỏ") {
-          fillColor = "yellow"; // nền vàng
-          color = "blue";       // viền mặc định
+          fillColor = "yellow";
+        } else if (crop === "Ngô") {
+          fillColor = "orange";
+        } else if (crop === "Sắn") {
+          fillColor = "green";
+        } else if (crop === "Đất trống") {
+          fillColor = "brown"; fillOpacity = 0.3;
+        }
+      }
+  
+      // --- Trường hợp xem từng loại cây ---
+      else {
+        if (crop === "Cỏ") {
+          fillColor = "yellow";
           const harvestDate = parseDate_fromSheet(harvestDateStr);
-        
           if (harvestDate) {
             const today = new Date();
             const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
-        
             if (days < 0) {
-              // Chưa đến ngày thu hoạch → để nhạt hơn
               fillOpacity = 0.3;
             } else {
-              // Sau ngày thu hoạch → độ mờ tăng dần đến max
               fillOpacity = Math.min(1, days / 90);
               if (days >= 90) {
-                color = "red"; // viền đỏ khi đã quá lâu
+                color = "red";
                 weight = 2;
               }
             }
           }
         } else if (crop === "Ngô") {
-          color = "blue"; fillColor = "orange";
+          fillColor = "orange";
+          const harvestDate = parseDate_fromSheet(harvestDateStr);
+          if (harvestDate) {
+            const today = new Date();
+            const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+            if (days >= 90) { color = "red"; weight = 2; }
+          }
         } else if (crop === "Sắn") {
-          color = "blue"; fillColor = "green";
+          fillColor = "green";
+          const harvestDate = parseDate_fromSheet(harvestDateStr);
+          if (harvestDate) {
+            const today = new Date();
+            const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+            if (days >= 90) { color = "red"; weight = 2; }
+          }
         } else if (crop === "Đất trống") {
-          color = "blue"; fillColor = "brown"; fillOpacity = 0.3;
+          fillColor = "brown"; fillOpacity = 0.3;
         }
-
-        const poly = L.polygon(coords, {
-          color: color,       // viền
-          weight: weight,
-          fillColor: fillColor, // nền
-          fillOpacity: fillOpacity
-        }).addTo(map);
-
-        poly.bindPopup(`
-          <b>${name}</b><br>
-          Diện tích: ${area} ha<br>
-          Cây: ${crop}<br>
-          Giai đoạn: ${stage}<br>
-          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-        `);
-
-        polygons.push(poly);
-      });
-    }
-
+      }
+  
+      const poly = L.polygon(coords, {
+        color: color,
+        weight: weight,
+        fillColor: fillColor,
+        fillOpacity: fillOpacity
+      }).addTo(map);
+  
+      poly.bindPopup(`
+        <b>${name}</b><br>
+        Diện tích: ${area} ha<br>
+        Cây: ${crop}<br>
+        Giai đoạn: ${stage}<br>
+        Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+      `);
+  
+      polygons.push(poly);
+    });
+  }
     // Lấy dữ liệu từ Google Sheets
     fetch(sheetUrl)
       .then(res => res.text())
@@ -381,6 +406,7 @@
   </script>
 </body>
 </html>
+
 
 
 
