@@ -133,6 +133,14 @@
     box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
     z-index: 1000;
   }
+     /* ===== LABEL CHỮ TRẦN ===== */
+  .custom-label {
+    font-weight: 200;
+    font-size: 13px;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+  }
   </style>
 </head>
 <body>
@@ -219,7 +227,47 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+    // Nhãn
+    const labelsLayer = L.layerGroup().addTo(map);
+    let showLabels = false;
 
+    function drawLabels() {
+      labelsLayer.clearLayers();
+      if (!showLabels) return;
+      rowsData.forEach(row => {
+        const name = row.c[0]?.v;
+        const area = row.c[1]?.v;
+        const coords = JSON.parse(row.c[5]?.v);
+        if (!coords || coords.length === 0) return;
+        const poly = L.polygon(coords);
+        const center = poly.getBounds().getCenter();
+        L.marker(center, {
+          icon: L.divIcon({
+            className: "custom-label",
+            html: `<div>${name}<br>${area} ha</div>`
+          })
+        }).addTo(labelsLayer);
+      });
+    }
+
+    // Nút toggle nhãn
+    const toggleBtn = L.control({position: 'topright'});
+    toggleBtn.onAdd = function () {
+      const btn = L.DomUtil.create('button', 'toggle-labels-btn');
+      btn.innerHTML = "👁️ Hiện nhãn";
+      btn.style.background = "#fff";
+      btn.style.border = "1px solid #ccc";
+      btn.style.padding = "6px 10px";
+      btn.style.cursor = "pointer";
+      btn.style.borderRadius = "4px";
+      btn.onclick = function() {
+        showLabels = !showLabels;
+        btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
+        drawLabels();
+      };
+      return btn;
+    };
+    toggleBtn.addTo(map);
     // Vẽ dữ liệu
     function drawData(filterCrop) {
       polygons.forEach(p => map.removeLayer(p));
@@ -311,4 +359,5 @@
   </script>
 </body>
 </html>
+
 
