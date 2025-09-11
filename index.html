@@ -168,7 +168,7 @@ toggleBtn.onAdd=function(){
 toggleBtn.addTo(map);
 
 // ================== LOAD SHEETS ==================
-const sheetCropsUrl="hhttps://docs.google.com/spreadsheets/d/e/2PACX-1vQxFVL3M5MxFkRp8kJiBh2AQY4tH7pFv1UW976iUvOalhNCQZoeAyJ0DVwJYlDUZsqAnjH-bsd-_B0v/gviz/tq?tqx=out:json&sheet=Trang%20tinh1";
+const sheetCropsUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vQxFVL3M5MxFkRp8kJiBh2AQY4tH7pFv1UW976iUvOalhNCQZoeAyJ0DVwJYlDUZsqAnjH-bsd-_B0v/gviz/tq?tqx=out:json&sheet=Trang%20tinh1";
 const sheetTasksUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vQxFVL3M5MxFkRp8kJiBh2AQY4tH7pFv1UW976iUvOalhNCQZoeAyJ0DVwJYlDUZsqAnjH-bsd-_B0v/gviz/tq?tqx=out:json&sheet=Cong%20viec%20hang%20ngay";
 
 fetchSheetJSON(sheetCropsUrl).then(json=>{rowsData=json.table.rows; drawData("all");});
@@ -225,5 +225,6 @@ if(window.innerWidth<=768){
 </script>
 </body>
 </html>
+
 
 
