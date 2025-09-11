@@ -5,176 +5,140 @@
   <title>Bản đồ trồng trọt từ Google Sheets</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <style>
- /* Navbar đẹp */
-#menu {
- background: linear-gradient(90deg, #007bff, #0056b3);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  position: relative;
-  z-index: 1000;
-  font-family: Arial, sans-serif;
-}
-
-#menu .menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-}
-
-#menu .menu > li {
-  position: relative;
-}
-
-#menu button {
-  background: none;
-  border: none;
-  padding: 14px 20px;
-  font-size: 15px;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-#menu button:hover {
-  background: rgba(255,255,255,0.15);
-}
-
-#menu button i {
-  font-size: 16px;
-}
-
-/* Submenu */
-#menu .submenu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: #fff;
-  list-style: none;
-  margin: 0;
-  padding: 6px 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  min-width: 200px;
-  border-radius: 4px;
-}
-
-#menu .submenu li {
-  text-align: left;
-}
-
-#menu .submenu button {
-  width: 100%;
-  text-align: left;
-  padding: 10px 14px;
-  font-size: 14px;
-  color: #333;
-  background: none;
-  border: none;
-}
-
-#menu .submenu button:hover {
-  background: #f0f0f0;
-  color: #007bff;
-}
-
-/* Hiện submenu khi hover (desktop) */
-#menu .menu > li:hover > .submenu {
-  display: block;
-}
-
-/* Responsive (Mobile) */
-@media (max-width: 768px) {
+  /* ===== MENU NGANG ===== */
+  #menu {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    position: relative;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+  }
   #menu .menu {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 cột */
-    grid-gap: 4px;
-    padding: 4px;
-  }
-
-  #menu .menu > li {
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 6px;
-    background: rgba(255,255,255,0.1);
-  }
-
-  #menu button {
-    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
     justify-content: center;
-    padding: 16px 10px;
+  }
+  #menu .menu > li { position: relative; }
+  #menu button {
+    background: none;
+    border: none;
+    padding: 14px 20px;
     font-size: 15px;
-    text-align: center;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-
-  #menu button i {
-    display: block;
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-
-  /* Submenu vẫn ẩn theo mặc định */
+  #menu button:hover { background: rgba(0,0,0,0.05); }
   #menu .submenu {
     display: none;
-    position: static;
-    box-shadow: none;
+    position: absolute;
+    top: 100%; left: 0;
     background: #fff;
-    margin-top: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    min-width: 200px;
     border-radius: 4px;
   }
-
+  #menu .submenu li { text-align: left; }
   #menu .submenu button {
+    width: 100%;
     text-align: left;
     padding: 10px 14px;
     font-size: 14px;
     color: #333;
+    background: none;
+    border: none;
   }
-
   #menu .submenu button:hover {
     background: #f0f0f0;
     color: #007bff;
   }
+  #menu .menu > li:hover > .submenu { display: block; }
 
-  /* Khi bấm vào thì mở submenu */
-  #menu .menu > li.open > .submenu {
-    display: block;
+  /* ===== MENU MOBILE ===== */
+  @media (max-width: 768px) {
+    #menu .menu {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 4px;
+      padding: 4px;
+    }
+    #menu .menu > li {
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.6);
+    }
+    #menu button {
+      width: 100%;
+      justify-content: center;
+      padding: 16px 10px;
+      font-size: 15px;
+      text-align: center;
+    }
+    #menu button i {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    #menu .submenu {
+      display: none;
+      position: static;
+      box-shadow: none;
+      background: #fff;
+      margin-top: 2px;
+      border-radius: 4px;
+    }
+    #menu .submenu button {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #333;
+    }
+    #menu .submenu button:hover {
+      background: #f0f0f0;
+      color: #007bff;
+    }
+    #menu .menu > li.open > .submenu { display: block; }
   }
-}
-#map {
-  height: calc(100vh - 100px); /* chừa chỗ cho menu + footer */
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
 
-#footerTitle {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  margin: 0;
-  padding: 4px 6px;
-  background: rgba(255,255,255,0.85);
-  text-align: center;
-  font-size: 13px;
-  font-weight: normal;
-  box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
-  z-index: 1000;
-}
+  /* ===== MAP + FOOTER ===== */
+  #map {
+    height: calc(100vh - 100px);
+    width: 100%;
+    margin: 0; padding: 0;
+  }
+  #footerTitle {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 4px 6px;
+    background: rgba(255,255,255,0.85);
+    text-align: center;
+    font-size: 13px;
+    box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
+    z-index: 1000;
+  }
   </style>
 </head>
 <body>
-  <!-- MENU NGANG DẠNG DROPDOWN -->
+  <!-- MENU -->
   <nav id="menu">
     <ul class="menu">
       <li>
-        <button>🌱Cây trồng ▾</button>
+        <button>🌱 Cây trồng ▾</button>
         <ul class="submenu">
           <li><button data-crop="all">🌍 Tổng thể</button></li>
           <li><button data-crop="Cỏ">🌱 Cỏ</button></li>
@@ -183,200 +147,160 @@
           <li><button data-crop="Đất trống">⬜ Đất trống</button></li>
         </ul>
       </li>
-
       <li>
-        <button>🛠️Công việc ▾</button>
+        <button>🛠️ Công việc ▾</button>
         <ul class="submenu">
-          <li><button data-task="daily">📅 Công việc hàng ngày</button></li>
-          <li><button data-task="note">📝 Lưu ý công việc</button></li>
-          <li><button data-task="weekly">📊 Báo cáo tuần</button></li>
+          <li><button>📅 Công việc hàng ngày</button></li>
+          <li><button>📝 Lưu ý công việc</button></li>
+          <li><button>📊 Báo cáo tuần</button></li>
         </ul>
       </li>
-
       <li>
-        <button>🏗️Hạ tầng ▾</button>
+        <button>🏗️ Hạ tầng ▾</button>
         <ul class="submenu">
-          <li><button data-infra="irrigation">💧 Hệ thống tưới</button></li>
-          <li><button data-infra="machine">🚜 Máy móc</button></li>
+          <li><button>💧 Hệ thống tưới</button></li>
+          <li><button>🚜 Máy móc</button></li>
         </ul>
       </li>
-
       <li>
-        <button>📜Pháp lý ▾</button>
+        <button>📜 Pháp lý ▾</button>
         <ul class="submenu">
-          <li><button data-legal="land">📖 Sổ đỏ</button></li>
+          <li><button>📖 Sổ đỏ</button></li>
         </ul>
       </li>
     </ul>
   </nav>
 
+  <!-- MAP -->
   <div id="map"></div>
-
-  <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình </h2>
+  <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
 
   <script>
-    window.onload = function() {
-      // --- Khai báo URL trước ---
-      var sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
+  window.onload = function() {
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
 
-      var polygons = [];
-      var rowsData = [];
+    let polygons = [];
+    let rowsData = [];
 
-      // --- Khởi tạo bản đồ ---
-      var map = L.map('map', {
-        center: [17.5089721, 106.4670833],
-        zoom: 13,
-        zoomControl: false
+    // Khởi tạo bản đồ
+    const map = L.map('map', {
+      center: [17.5089721, 106.4670833],
+      zoom: 13,
+      zoomControl: false
+    });
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Nhãn
+    const labelsLayer = L.layerGroup().addTo(map);
+    let showLabels = false;
+
+    function drawLabels() {
+      labelsLayer.clearLayers();
+      if (!showLabels) return;
+      rowsData.forEach(row => {
+        const name = row.c[0]?.v;
+        const crop = row.c[2]?.v;
+        const coords = JSON.parse(row.c[5]?.v);
+        if (!coords || coords.length === 0) return;
+        const poly = L.polygon(coords);
+        const center = poly.getBounds().getCenter();
+        L.marker(center, {
+          icon: L.divIcon({
+            className: "custom-label",
+            html: `<div style="font-size:12px; color:#000; background:rgba(255,255,255,0.7); padding:2px 4px; border-radius:4px; border:1px solid #ccc;">
+                     ${name} - ${crop}
+                   </div>`
+          })
+        }).addTo(labelsLayer);
       });
+    }
 
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-
-      // --- Hàm vẽ dữ liệu ---
-      function drawData(filterCrop) {
-        polygons.forEach(p => map.removeLayer(p));
-        polygons = [];
-
-        rowsData.forEach(row => {
-          var name = row.c[0]?.v;
-          var area = row.c[1]?.v;
-          var crop = row.c[2]?.v;
-          var stage = row.c[3]?.v;
-          var coords = JSON.parse(row.c[5]?.v);
-          var harvestDateStr = row.c[4]?.v;
-
-          if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
-
-          var color = "gray";
-          var fillOpacity = 0.6;
-
-          if (crop === "Cỏ") {
-            color = "yellow";
-          } else if (crop === "Sắn") {
-            color = "green";
-          } else if (crop === "Ngô") {
-            color = "orange";
-          } else if (crop === "Đất trống") {
-            color = "brown";
-            fillOpacity = 0.3;
-          }
-
-          var poly = L.polygon(coords, {
-            color: "blue",
-            weight: 0.5,
-            fillColor: color,
-            fillOpacity: fillOpacity
-          }).addTo(map);
-
-          poly.bindPopup(`
-            <b>${name}</b><br>
-            Diện tích: ${area} ha<br>
-            Cây: ${crop}<br>
-            Giai đoạn: ${stage}<br>
-            Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-          `);
-
-          polygons.push(poly);
-        });
-      }
-
-      // --- Lấy dữ liệu từ Google Sheets ---
-      fetch(sheetUrl)
-        .then(res => res.text())
-        .then(data => {
-          var json = JSON.parse(data.substr(47).slice(0, -2));
-          rowsData = json.table.rows;
-          drawData("all");
-        });
-
-      // --- Bắt sự kiện chọn crop ---
-      document.querySelectorAll("[data-crop]").forEach(btn => {
-        btn.addEventListener("click", function() {
-          var crop = this.getAttribute("data-crop");
-          drawData(crop);
-        });
-      });
-
-      // --- JS cho mobile menu ---
-      if (window.innerWidth <= 768) {
-        document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
-          btn.addEventListener("click", function(e) {
-            e.preventDefault();
-            var li = this.parentElement;
-
-            document.querySelectorAll("#menu .menu > li").forEach(item => {
-              if (item !== li) item.classList.remove("open");
-            });
-
-            li.classList.toggle("open");
-          });
-        });
-      }
+    // Nút toggle nhãn
+    const toggleBtn = L.control({position: 'topright'});
+    toggleBtn.onAdd = function () {
+      const btn = L.DomUtil.create('button', 'toggle-labels-btn');
+      btn.innerHTML = "👁️ Hiện nhãn";
+      btn.style.background = "#fff";
+      btn.style.border = "1px solid #ccc";
+      btn.style.padding = "6px 10px";
+      btn.style.cursor = "pointer";
+      btn.style.borderRadius = "4px";
+      btn.onclick = function() {
+        showLabels = !showLabels;
+        btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
+        drawLabels();
+      };
+      return btn;
     };
-    // Tạo group chứa label
-var labelsLayer = L.layerGroup().addTo(map);
-var showLabels = false; // trạng thái
+    toggleBtn.addTo(map);
 
-// Hàm vẽ lại label
-function drawLabels() {
-  labelsLayer.clearLayers(); // xóa cũ
-  if (!showLabels) return;
+    // Vẽ dữ liệu
+    function drawData(filterCrop) {
+      polygons.forEach(p => map.removeLayer(p));
+      polygons = [];
+      rowsData.forEach(row => {
+        const name = row.c[0]?.v;
+        const area = row.c[1]?.v;
+        const crop = row.c[2]?.v;
+        const stage = row.c[3]?.v;
+        const coords = JSON.parse(row.c[5]?.v);
+        const harvestDateStr = row.c[4]?.v;
+        if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+        let color = "gray", fillOpacity = 0.6;
+        if (crop === "Cỏ") color = "yellow";
+        else if (crop === "Sắn") color = "green";
+        else if (crop === "Ngô") color = "orange";
+        else if (crop === "Đất trống") { color = "brown"; fillOpacity = 0.3; }
+        const poly = L.polygon(coords, {
+          color: "blue", weight: 0.5,
+          fillColor: color, fillOpacity: fillOpacity
+        }).addTo(map);
+        poly.bindPopup(`
+          <b>${name}</b><br>
+          Diện tích: ${area} ha<br>
+          Cây: ${crop}<br>
+          Giai đoạn: ${stage}<br>
+          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+        `);
+        polygons.push(poly);
+      });
+      drawLabels();
+    }
 
-  rowsData.forEach(row => {
-    var name = row.c[0]?.v;
-    var crop = row.c[2]?.v;
-    var coords = JSON.parse(row.c[5]?.v);
+    // Lấy dữ liệu từ Google Sheets
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(data => {
+        const json = JSON.parse(data.substr(47).slice(0, -2));
+        rowsData = json.table.rows;
+        drawData("all");
+      });
 
-    if (!coords || coords.length === 0) return;
+    // Chọn crop
+    document.querySelectorAll("[data-crop]").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const crop = this.getAttribute("data-crop");
+        drawData(crop);
+      });
+    });
 
-    // Lấy tâm polygon
-    var poly = L.polygon(coords);
-    var center = poly.getBounds().getCenter();
-
-    // Tạo label
-    L.marker(center, {
-      icon: L.divIcon({
-        className: "custom-label",
-        html: `<div style="font-size:12px; color:#000; background:rgba(255,255,255,0.7); padding:2px 4px; border-radius:4px; border:1px solid #ccc;">
-                 ${name} - ${crop}
-               </div>`
-      })
-    }).addTo(labelsLayer);
-  });
-}
-
-// Thêm nút toggle vào map
-var toggleBtn = L.control({position: 'topright'});
-toggleBtn.onAdd = function () {
-  var btn = L.DomUtil.create('button', 'toggle-labels-btn');
-  btn.innerHTML = "👁️ Hiện nhãn";
-  btn.style.background = "#fff";
-  btn.style.border = "1px solid #ccc";
-  btn.style.padding = "6px 10px";
-  btn.style.cursor = "pointer";
-  btn.style.borderRadius = "4px";
-
-  btn.onclick = function() {
-    showLabels = !showLabels;
-    btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
-    drawLabels();
+    // Mobile menu
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.preventDefault();
+          const li = this.parentElement;
+          document.querySelectorAll("#menu .menu > li").forEach(item => {
+            if (item !== li) item.classList.remove("open");
+          });
+          li.classList.toggle("open");
+        });
+      });
+    }
   };
-  return btn;
-};
-toggleBtn.addTo(map);
-
-// Gọi lại drawLabels sau khi load dữ liệu
-// (ví dụ trong fetch(...).then(...) sau drawData("all"))
-
   </script>
 </body>
 </html>
-
-
-
-
-
-
