@@ -11,8 +11,8 @@
   <style>
  /* Navbar đẹp */
 #menu {
-  background: linear-gradient(90deg, #e6f0ff, #f5f9ff); /* xanh nhạt gần trắng */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+ background: linear-gradient(90deg, #007bff, #0056b3);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   position: relative;
   z-index: 1000;
   font-family: Arial, sans-serif;
@@ -316,9 +316,65 @@
         });
       }
     };
+    // Tạo group chứa label
+var labelsLayer = L.layerGroup().addTo(map);
+var showLabels = false; // trạng thái
+
+// Hàm vẽ lại label
+function drawLabels() {
+  labelsLayer.clearLayers(); // xóa cũ
+  if (!showLabels) return;
+
+  rowsData.forEach(row => {
+    var name = row.c[0]?.v;
+    var crop = row.c[2]?.v;
+    var coords = JSON.parse(row.c[5]?.v);
+
+    if (!coords || coords.length === 0) return;
+
+    // Lấy tâm polygon
+    var poly = L.polygon(coords);
+    var center = poly.getBounds().getCenter();
+
+    // Tạo label
+    L.marker(center, {
+      icon: L.divIcon({
+        className: "custom-label",
+        html: `<div style="font-size:12px; color:#000; background:rgba(255,255,255,0.7); padding:2px 4px; border-radius:4px; border:1px solid #ccc;">
+                 ${name} - ${crop}
+               </div>`
+      })
+    }).addTo(labelsLayer);
+  });
+}
+
+// Thêm nút toggle vào map
+var toggleBtn = L.control({position: 'topright'});
+toggleBtn.onAdd = function () {
+  var btn = L.DomUtil.create('button', 'toggle-labels-btn');
+  btn.innerHTML = "👁️ Hiện nhãn";
+  btn.style.background = "#fff";
+  btn.style.border = "1px solid #ccc";
+  btn.style.padding = "6px 10px";
+  btn.style.cursor = "pointer";
+  btn.style.borderRadius = "4px";
+
+  btn.onclick = function() {
+    showLabels = !showLabels;
+    btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
+    drawLabels();
+  };
+  return btn;
+};
+toggleBtn.addTo(map);
+
+// Gọi lại drawLabels sau khi load dữ liệu
+// (ví dụ trong fetch(...).then(...) sau drawData("all"))
+
   </script>
 </body>
 </html>
+
 
 
 
