@@ -156,9 +156,9 @@
 .toggle-labels-btn:hover {
   background: #f0f0f0;
 }
-  #infoBox {
+#infoBox {
   position: fixed;
-  top: 60px; /* dưới menu */
+  bottom: 40px; /* ở cuối bên trái */
   left: 10px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
@@ -169,6 +169,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   z-index: 1200;
 }
+
 
   </style>
 </head>
@@ -331,23 +332,25 @@
       }
       // Lọc theo loại cây
       else {
-        if (crop === "Cỏ") {
-          fillColor = "yellow";
-          const harvestDate = parseDate_fromSheet(harvestDateStr);
-          if (harvestDate) {
-            const today = new Date();
-            const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
-            if (days < 0) {
-              fillOpacity = 0.3;
-              totalGrassArea += area; // chưa thu hoạch
-            } else {
-              fillOpacity = Math.min(1, days / 90);
-              if (days >= 90) { color = "red"; weight = 2; }
-            }
+      if (crop === "Cỏ") {
+        fillColor = "yellow";
+        const harvestDate = parseDate_fromSheet(harvestDateStr);
+        if (harvestDate) {
+          const today = new Date();
+          const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+          if (days < 0) {
+            fillOpacity = 0.3; // chưa đến ngày
           } else {
-            totalGrassArea += area; // chưa có ngày thu hoạch
+            fillOpacity = Math.min(1, days / 90);
+            if (days >= 0) {
+              totalGrassArea += area; // đã đến ngày mà chưa thu hoạch
+            }
+            if (days >= 90) { color = "red"; weight = 2; }
           }
-        } else if (crop === "Ngô") {
+        } else {
+          // Nếu chưa có ngày thu hoạch thì không cộng
+        }
+      } else if (crop === "Ngô") {
           fillColor = "orange";
         } else if (crop === "Sắn") {
           fillColor = "green";
@@ -418,6 +421,7 @@
   <div id="infoBox" style="display:none;">🌱 Cỏ chưa thu hoạch: 0 ha</div>
 </body>
 </html>
+
 
 
 
