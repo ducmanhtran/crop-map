@@ -70,24 +70,11 @@
 
   /* ===== MENU MOBILE ===== */
   @media (max-width: 768px) {
-    .toggle-labels-btn {
-      background: #fff;
-      border: 1px solid #bbb;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      margin-bottom: 40px; /* đẩy lên khỏi zoom control */
-    }
-    .toggle-labels-btn:hover {
-      background: #f0f0f0;
-    }
     #infoBox {
-    bottom: 80px;  /* đẩy lên cao hơn chút cho điện thoại */
-    left: 5px;
-    font-size: 13px;
-    padding: 6px 10px;
+      bottom: 80px;
+      left: 5px;
+      font-size: 13px;
+      padding: 6px 10px;
     }
     #menu .menu {
       display: grid;
@@ -152,7 +139,8 @@
     box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
     z-index: 1000;
   }
-     /* ===== LABEL CHỮ TRẦN ===== */
+
+  /* ===== LABEL & TOGGLE ===== */
   .custom-label {
     font-weight: 200;
     font-size: 13px;
@@ -160,33 +148,32 @@
     text-align: center;
     white-space: nowrap;
   }
-    .toggle-labels-btn {
-  background: #fff;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
-.toggle-labels-btn:hover {
-  background: #f0f0f0;
-}
-#infoBox {
-  position: fixed;
-  bottom: 40px; /* ở cuối bên trái */
-  left: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 1200;
-}
-
-
+  .toggle-labels-btn {
+    background: #fff;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    margin-bottom: 40px;
+  }
+  .toggle-labels-btn:hover {
+    background: #f0f0f0;
+  }
+  #infoBox {
+    position: fixed;
+    bottom: 40px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 1200;
+  }
   </style>
 </head>
 <body>
@@ -237,12 +224,13 @@
 
     let polygons = [];
     let rowsData = [];
+    let labels = [];
+    let labelsVisible = false;
+    let currentFilter = "all";
 
-    // Parse ngày từ Google Sheets
     function parseDate_fromSheet(str) {
       if (!str) return null;
       str = String(str).trim();
-
       if (str.includes("/")) {
         const parts = str.split("/");
         if (parts.length === 3) {
@@ -252,7 +240,6 @@
           return new Date(year, month, day);
         }
       }
-
       const match = str.match(/Date\((\d+),(\d+),(\d+)\)/);
       if (match) {
         const year = parseInt(match[1], 10);
@@ -263,7 +250,6 @@
       return null;
     }
 
-    // Khởi tạo bản đồ
     const map = L.map('map', {
       center: [17.5089721, 106.4670833],
       zoom: 13,
@@ -273,142 +259,139 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-    // Nhãn
-    const labelsLayer = L.layerGroup().addTo(map);
-    let showLabels = false;
 
-    function drawLabels() {
-      labelsLayer.clearLayers();
-      if (!showLabels) return;
-      rowsData.forEach(row => {
-        const name = row.c[0]?.v;
-        const area = row.c[1]?.v;
-        const coords = JSON.parse(row.c[5]?.v);
-        if (!coords || coords.length === 0) return;
-        const poly = L.polygon(coords);
-        const center = poly.getBounds().getCenter();
-        L.marker(center, {
-          icon: L.divIcon({
-            className: "custom-label",
-            html: `<div>${name}<br>${area} ha</div>`
-          })
-        }).addTo(labelsLayer);
+    function updateLabelsVisibility() {
+      labels.forEach(l => map.removeLayer(l));
+      if (!labelsVisible) return;
+      labels.forEach(l => {
+        const crop = l.options.crop;
+        if (currentFilter === "all" || crop === currentFilter) {
+          l.addTo(map);
+        }
       });
     }
 
-    // Nút toggle nhãn
     const toggleBtn = L.control({position: 'bottomright'});
     toggleBtn.onAdd = function () {
       const btn = L.DomUtil.create('button', 'toggle-labels-btn');
       btn.innerHTML = "👁️ Hiện nhãn";
-      btn.style.background = "#fff";
-      btn.style.border = "1px solid #ccc";
-      btn.style.padding = "6px 10px";
-      btn.style.cursor = "pointer";
-      btn.style.borderRadius = "4px";
       btn.onclick = function() {
-        showLabels = !showLabels;
-        btn.innerHTML = showLabels ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
-        drawLabels();
+        labelsVisible = !labelsVisible;
+        btn.innerHTML = labelsVisible ? "🙈 Ẩn nhãn" : "👁️ Hiện nhãn";
+        updateLabelsVisibility();
       };
       return btn;
     };
     toggleBtn.addTo(map);
-    // Vẽ dữ liệu
+
     function drawData(filterCrop) {
-    polygons.forEach(p => map.removeLayer(p));
-    polygons = [];
-  
-    let totalGrassArea = 0;
-    let totalCassavaArea = 0;
-  
-    rowsData.forEach(row => {
-      const name = row.c[0]?.v;
-      const area = parseFloat(row.c[1]?.v) || 0;
-      const crop = row.c[2]?.v;
-      const stage = row.c[3]?.v;
-      const dateStr = row.c[4]?.v; // ngày trồng hoặc thu hoạch
-      const coords = JSON.parse(row.c[5]?.v);
-      if (!coords) return;
-  
-      if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
-  
-      let color = "blue", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
-  
-      if (filterCrop === "all") {
-        // Tổng thể
-        if (crop === "Cỏ") fillColor = "yellow";
-        else if (crop === "Ngô") fillColor = "orange";
-        else if (crop === "Sắn") fillColor = "green";
-        else if (crop === "Đất trống") { fillColor = "brown"; fillOpacity = 0.3; }
-      } else {
-        if (crop === "Cỏ") {
-          fillColor = "yellow";
-          const harvestDate = parseDate_fromSheet(dateStr);
-          if (harvestDate) {
-            const today = new Date();
-            const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
-            if (days < 0) {
-              fillOpacity = 0.3;
-              totalGrassArea += area; // chưa thu hoạch
+      polygons.forEach(p => map.removeLayer(p));
+      polygons = [];
+      labels.forEach(l => map.removeLayer(l));
+      labels = [];
+      currentFilter = filterCrop;
+
+      let totalGrassArea = 0;
+      let totalCassavaArea = 0;
+
+      rowsData.forEach(row => {
+        const name = row.c[0]?.v;
+        const area = parseFloat(row.c[1]?.v) || 0;
+        const crop = row.c[2]?.v;
+        const stage = row.c[3]?.v;
+        const dateStr = row.c[4]?.v;
+        const coords = JSON.parse(row.c[5]?.v);
+        if (!coords) return;
+
+        if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+
+        let color = "blue", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
+
+        if (filterCrop === "all") {
+          if (crop === "Cỏ") fillColor = "yellow";
+          else if (crop === "Ngô") fillColor = "orange";
+          else if (crop === "Sắn") fillColor = "green";
+          else if (crop === "Đất trống") { fillColor = "brown"; fillOpacity = 0.3; }
+        } else {
+          if (crop === "Cỏ") {
+            fillColor = "yellow";
+            const harvestDate = parseDate_fromSheet(dateStr);
+            if (harvestDate) {
+              const today = new Date();
+              const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+              if (days < 0) {
+                fillOpacity = 0.3;
+                totalGrassArea += area;
+              } else {
+                fillOpacity = Math.min(1, days / 90);
+                if (days >= 90) { color = "red"; weight = 2; }
+              }
             } else {
-              fillOpacity = Math.min(1, days / 90);
-              if (days >= 90) { color = "red"; weight = 2; }
+              totalGrassArea += area;
             }
-          } else {
-            totalGrassArea += area; // chưa có ngày
-          }
-        } 
-        else if (crop === "Ngô") {
-          fillColor = "orange";
-        } 
-        else if (crop === "Sắn") {
-          fillColor = "green";
-          const plantedDate = parseDate_fromSheet(dateStr);
-          if (plantedDate) {
-            const today = new Date();
-            const months = (today - plantedDate) / (1000 * 60 * 60 * 24 * 30);
-            if (months >= 10) {
-              color = "red"; weight = 2;
-              totalCassavaArea += area; // đủ 10 tháng, chưa thu hoạch
+          } 
+          else if (crop === "Ngô") {
+            fillColor = "orange";
+          } 
+          else if (crop === "Sắn") {
+            fillColor = "green";
+            const plantedDate = parseDate_fromSheet(dateStr);
+            if (plantedDate) {
+              const today = new Date();
+              const months = (today - plantedDate) / (1000 * 60 * 60 * 24 * 30);
+              if (months >= 10) {
+                color = "red"; weight = 2;
+                totalCassavaArea += area;
+              }
             }
+          } 
+          else if (crop === "Đất trống") {
+            fillColor = "brown"; fillOpacity = 0.3;
           }
-        } 
-        else if (crop === "Đất trống") {
-          fillColor = "brown"; fillOpacity = 0.3;
         }
+
+        const poly = L.polygon(coords, {
+          color: color,
+          weight: weight,
+          fillColor: fillColor,
+          fillOpacity: fillOpacity
+        }).addTo(map);
+
+        poly.bindPopup(`
+          <b>${name}</b><br>
+          Diện tích: ${area} ha<br>
+          Cây: ${crop}<br>
+          Giai đoạn: ${stage}<br>
+          Ngày: ${dateStr || "Chưa có"}
+        `);
+
+        polygons.push(poly);
+
+        // Tạo label
+        const label = L.marker(poly.getBounds().getCenter(), {
+          icon: L.divIcon({
+            className: "custom-label",
+            html: `${name}<br>${area} ha`
+          }),
+          crop: crop
+        });
+        labels.push(label);
+      });
+
+      updateLabelsVisibility();
+
+      const box = document.getElementById("infoBox");
+      if (filterCrop === "Cỏ") {
+        box.style.display = "block";
+        box.innerText = `🌱 Cỏ chưa thu hoạch: ${totalGrassArea.toFixed(2)} ha`;
+      } else if (filterCrop === "Sắn") {
+        box.style.display = "block";
+        box.innerText = `🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;
+      } else {
+        box.style.display = "none";
       }
-  
-      const poly = L.polygon(coords, {
-        color: color,
-        weight: weight,
-        fillColor: fillColor,
-        fillOpacity: fillOpacity
-      }).addTo(map);
-  
-      poly.bindPopup(`
-        <b>${name}</b><br>
-        Diện tích: ${area} ha<br>
-        Cây: ${crop}<br>
-        Giai đoạn: ${stage}<br>
-        Ngày: ${dateStr || "Chưa có"}
-      `);
-  
-      polygons.push(poly);
-    });
-  // Hiển thị hoặc ẩn infoBox
-    const box = document.getElementById("infoBox");
-    if (filterCrop === "Cỏ") {
-      box.style.display = "block";
-      box.innerText = `🌱 Cỏ chưa thu hoạch: ${totalGrassArea.toFixed(2)} ha`;
-    } else if (filterCrop === "Sắn") {
-      box.style.display = "block";
-      box.innerText = `🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;
-    } else {
-      box.style.display = "none";
     }
-  }
-    // Lấy dữ liệu từ Google Sheets
+
     fetch(sheetUrl)
       .then(res => res.text())
       .then(data => {
@@ -417,7 +400,6 @@
         drawData("all");
       });
 
-    // Chọn crop
     document.querySelectorAll("[data-crop]").forEach(btn => {
       btn.addEventListener("click", function() {
         const crop = this.getAttribute("data-crop");
@@ -425,7 +407,6 @@
       });
     });
 
-    // Mobile menu
     if (window.innerWidth <= 768) {
       document.querySelectorAll("#menu .menu > li > button").forEach(btn => {
         btn.addEventListener("click", function(e) {
@@ -443,13 +424,3 @@
   <div id="infoBox" style="display:none;">🌱 Cỏ chưa thu hoạch: 0 ha</div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
