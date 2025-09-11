@@ -218,9 +218,12 @@
   <div id="map"></div>
   <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
 
+  <div id="infoBox" style="display:none;">🌱 Cỏ chưa thu hoạch: 0 ha</div>
+
   <script>
   window.onload = function() {
-    const sheetUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vQxFVL3M5MxFkRp8kJiBh2AQY4tH7pFv1UW976iUvOalhNCQZoeAyJ0DVwJYlDUZsqAnjH-bsd-_B0v/gviz/tq?tqx=out:json&sheet=Trang%20tinh1";
+    const sheetCropsUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQxFVL3M5MxFkRp8kJiBh2AQY4tH7pFv1UW976iUvOalhNCQZoeAyJ0DVwJYlDUZsqAnjH-bsd-_B0v/gviz/tq?tqx=out:json&sheet=Trang%20tinh1";
+    
     let polygons = [];
     let rowsData = [];
     let labels = [];
@@ -263,8 +266,7 @@
       labels.forEach(l => map.removeLayer(l));
       if (!labelsVisible) return;
       labels.forEach(l => {
-        const crop = l.options.crop;
-        if (currentFilter === "all" || crop === currentFilter) {
+        if (currentFilter === "all" || l.crop === currentFilter) {
           l.addTo(map);
         }
       });
@@ -317,7 +319,7 @@
             const harvestDate = parseDate_fromSheet(dateStr);
             if (harvestDate) {
               const today = new Date();
-              const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+              const days = Math.floor((today - harvestDate) / (1000*60*60*24));
               if (days < 0) {
                 fillOpacity = 0.3;
                 totalGrassArea += area;
@@ -337,7 +339,7 @@
             const plantedDate = parseDate_fromSheet(dateStr);
             if (plantedDate) {
               const today = new Date();
-              const months = (today - plantedDate) / (1000 * 60 * 60 * 24 * 30);
+              const months = (today - plantedDate)/(1000*60*60*24*30);
               if (months >= 10) {
                 color = "red"; weight = 2;
                 totalCassavaArea += area;
@@ -371,9 +373,9 @@
           icon: L.divIcon({
             className: "custom-label",
             html: `${name}<br>${area} ha`
-          }),
-          crop: crop
+          })
         });
+        label.crop = crop;
         labels.push(label);
       });
 
@@ -391,12 +393,25 @@
       }
     }
 
-    fetch(sheetUrl)
+    // ==== FETCH GOOGLE SHEET AN TOÀN ====
+    fetch(sheetCropsUrl)
       .then(res => res.text())
       .then(data => {
-        const json = JSON.parse(data.substr(47).slice(0, -2));
-        rowsData = json.table.rows;
-        drawData("all");
+        const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+        if (!match) {
+          console.error("Không parse được dữ liệu từ Google Sheet");
+          return;
+        }
+        try {
+          const json = JSON.parse(match[1]);
+          rowsData = json.table.rows;
+          drawData("all");
+        } catch (err) {
+          console.error("Lỗi parse JSON:", err);
+        }
+      })
+      .catch(err => {
+        console.error("Lỗi fetch Google Sheet:", err);
       });
 
     document.querySelectorAll("[data-crop]").forEach(btn => {
@@ -420,14 +435,5 @@
     }
   };
   </script>
-  <div id="infoBox" style="display:none;">🌱 Cỏ chưa thu hoạch: 0 ha</div>
 </body>
 </html>
-
-
-
-
-
-
-
-
