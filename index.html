@@ -247,15 +247,29 @@
     toggleBtn.addTo(map);
 
     // Parse ngày dd/mm/yyyy
-    function parseDate_ddmmyyyy(str) {
+      // Parse ngày từ Google Sheets
+    function parseDate_fromSheet(str) {
       if (!str) return null;
-      const parts = str.split("/");
-      if (parts.length !== 3) return null;
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
+      str = String(str).trim();
+    
+      // Nếu dạng dd/mm/yyyy
+      if (str.includes("/")) {
+        const parts = str.split("/");
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+          return new Date(year, month, day);
+        }
+      }
+    
+      // Nếu dạng Date(YYYY,MM,DD)
+      const match = str.match(/Date\((\d+),(\d+),(\d+)\)/);
+      if (match) {
+        const year = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10); // ở đây đã là chuẩn JS, tháng 0-11
+        const day = parse
+
 
     // Vẽ dữ liệu
     function drawData(filterCrop) {
@@ -282,7 +296,7 @@
           fillOpacity = 0.4;
 
           if (harvestDateStr) {
-            const harvestDate = parseDate_ddmmyyyy(harvestDateStr);
+            const harvestDate = parseDate_fromSheet(harvestDateStr);
             const today = new Date();
 
             if (harvestDate) {
@@ -362,3 +376,4 @@
   </script>
 </body>
 </html>
+
