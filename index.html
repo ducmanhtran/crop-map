@@ -235,11 +235,11 @@
         if (!coords) return;
         if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
 
-        let color = "gray", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
+        let color = "blue", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
 
         if (crop === "Cỏ") {
           fillColor = "yellow"; // nền vàng
-          color = "yellow";     // viền mặc định
+          color = "blue";     // viền mặc định
           const harvestDate = parseDate_fromSheet(harvestDateStr);
           if (harvestDate) {
             const today = new Date();
@@ -251,11 +251,11 @@
             }
           }
         } else if (crop === "Ngô") {
-          color = "orange"; fillColor = "orange";
+          color = "blue"; fillColor = "orange";
         } else if (crop === "Sắn") {
-          color = "green"; fillColor = "green";
+          color = "blue"; fillColor = "green";
         } else if (crop === "Đất trống") {
-          color = "brown"; fillColor = "brown"; fillOpacity = 0.3;
+          color = "blue"; fillColor = "brown"; fillOpacity = 0.3;
         }
 
         const poly = L.polygon(coords, {
@@ -311,3 +311,4 @@
   </script>
 </body>
 </html>
+
