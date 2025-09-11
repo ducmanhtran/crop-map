@@ -87,7 +87,7 @@
       padding: 16px 10px;
       font-size: 15px;
       text-align: center;
-      color: #000; /* chữ đen cho mobile */
+      color: #000;
     }
     #menu button i {
       display: block;
@@ -189,7 +189,6 @@
       if (!str) return null;
       str = String(str).trim();
 
-      // Nếu dạng dd/mm/yyyy
       if (str.includes("/")) {
         const parts = str.split("/");
         if (parts.length === 3) {
@@ -200,15 +199,13 @@
         }
       }
 
-      // Nếu dạng Date(YYYY,MM,DD)
       const match = str.match(/Date\((\d+),(\d+),(\d+)\)/);
       if (match) {
         const year = parseInt(match[1], 10);
-        const month = parseInt(match[2], 10); // JS tháng 0-11
+        const month = parseInt(match[2], 10);
         const day = parseInt(match[3], 10);
         return new Date(year, month, day);
       }
-
       return null;
     }
 
@@ -227,6 +224,7 @@
     function drawData(filterCrop) {
       polygons.forEach(p => map.removeLayer(p));
       polygons = [];
+
       rowsData.forEach(row => {
         const name = row.c[0]?.v;
         const area = row.c[1]?.v;
@@ -237,11 +235,11 @@
         if (!coords) return;
         if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
 
-        let color = "gray", fillOpacity = 0.6, weight = 0.5;
+        let color = "gray", fillColor = "gray", fillOpacity = 0.6, weight = 0.5;
 
         if (crop === "Cỏ") {
-          fillColor = "yellow";
-          color = "yellow";
+          fillColor = "yellow"; // nền vàng
+          color = "yellow";     // viền mặc định
           const harvestDate = parseDate_fromSheet(harvestDateStr);
           if (harvestDate) {
             const today = new Date();
@@ -252,13 +250,12 @@
               weight = 2;
             }
           }
-
         } else if (crop === "Ngô") {
-          color = "orange";
+          color = "orange"; fillColor = "orange";
         } else if (crop === "Sắn") {
-          color = "green";
+          color = "green"; fillColor = "green";
         } else if (crop === "Đất trống") {
-          color = "brown"; fillOpacity = 0.3;
+          color = "brown"; fillColor = "brown"; fillOpacity = 0.3;
         }
 
         const poly = L.polygon(coords, {
@@ -267,7 +264,6 @@
           fillColor: fillColor, // nền
           fillOpacity: fillOpacity
         }).addTo(map);
-
 
         poly.bindPopup(`
           <b>${name}</b><br>
@@ -315,4 +311,3 @@
   </script>
 </body>
 </html>
-
