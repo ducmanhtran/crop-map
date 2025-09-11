@@ -240,17 +240,19 @@
         let color = "gray", fillOpacity = 0.6, weight = 0.5;
 
         if (crop === "Cỏ") {
-          color = "green";
+          fillColor = "yellow";
+          color = "yellow";
           const harvestDate = parseDate_fromSheet(harvestDateStr);
           if (harvestDate) {
             const today = new Date();
             const days = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
             fillOpacity = Math.min(1, days / 90);
             if (days >= 90) {
-              color = "red";
+              color = "red"; // viền đỏ
               weight = 2;
             }
           }
+
         } else if (crop === "Ngô") {
           color = "orange";
         } else if (crop === "Sắn") {
@@ -260,11 +262,12 @@
         }
 
         const poly = L.polygon(coords, {
-          color: color,
+          color: color,       // viền
           weight: weight,
-          fillColor: color,
+          fillColor: fillColor, // nền
           fillOpacity: fillOpacity
         }).addTo(map);
+
 
         poly.bindPopup(`
           <b>${name}</b><br>
@@ -312,3 +315,4 @@
   </script>
 </body>
 </html>
+
