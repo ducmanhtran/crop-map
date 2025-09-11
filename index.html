@@ -269,36 +269,101 @@
 
     // Vẽ dữ liệu
     function drawData(filterCrop) {
-      polygons.forEach(p => map.removeLayer(p));
-      polygons = [];
-      rowsData.forEach(row => {
-        const name = row.c[0]?.v;
-        const area = row.c[1]?.v;
-        const crop = row.c[2]?.v;
-        const stage = row.c[3]?.v;
-        const coords = JSON.parse(row.c[5]?.v);
-        const harvestDateStr = row.c[4]?.v;
-        if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
-        let color = "gray", fillOpacity = 0.6;
-        if (crop === "Cỏ") color = "yellow";
-        else if (crop === "Sắn") color = "green";
-        else if (crop === "Ngô") color = "orange";
-        else if (crop === "Đất trống") { color = "brown"; fillOpacity = 0.3; }
-        const poly = L.polygon(coords, {
-          color: "blue", weight: 0.5,
-          fillColor: color, fillOpacity: fillOpacity
-        }).addTo(map);
-        poly.bindPopup(`
-          <b>${name}</b><br>
-          Diện tích: ${area} ha<br>
-          Cây: ${crop}<br>
-          Giai đoạn: ${stage}<br>
-          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-        `);
-        polygons.push(poly);
-      });
-      drawLabels();
-    }
+    // Xóa các polygon cũ
+    polygons.forEach(p => map.removeLayer(p));
+    polygons = [];
+  
+    rowsData.forEach(row => {
+      const name = row.c[0]?.v;
+      const area = row.c[1]?.v;
+      const crop = row.c[2]?.v;
+      const stage = row.c[3]?.v;
+      const coords = JSON.parse(row.c[5]?.v);
+      const harvestDateStr = row.c[4]?.v; // ngày thu hoạch thực tế (dd/mm/yyyy)
+  
+      if (!coords) return;
+      if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+  
+      let color = "blue";        // viền mặc định
+      let fillColor = "gray";    // màu mặc định
+      let fillOpacity = 0.6;     // độ mờ mặc định
+  
+      // ======= Xử lý theo loại cây =======
+      if (crop === "Cỏ") {
+        fillColor = "yellow";
+        fillOpacity = 0.4; // mặc định vàng nhạt
+  
+        if (harvestDateStr) {
+          // parse dd/mm/yyyy -> Date
+          const parts = harvestDateStr.split("/");
+          if (parts.length === 3) {
+            const harvestDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            const today = new Date();
+  
+            // số ngày kể từ lần thu hoạch gần nhất
+            const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
+  
+            if (!isNaN(diffDays)) {
+              // opacity tỷ lệ theo số ngày / 90 (min 0.1, max 1)
+              let ratio = diffDays / 90;
+              fillOpacity = Math.max(0.1, Math.min(ratio, 1));
+  
+              // nếu đã đủ 90 ngày mà chưa thu hoạch lại => viền đỏ
+              if (diffDays >= 90) {
+                color = "red";
+                fillOpacity = 1;
+              }
+            }
+          }
+        }
+      } else if (crop === "Sắn") {
+        fillColor = "green";
+      } else if (crop === "Ngô") {
+        fillColor = "orange";
+      } else if (crop === "Đất trống") {
+        fillColor = "brown";
+        fillOpacity = 0.3;
+      }
+  
+      // ======= Vẽ polygon =======
+      const poly = L.polygon(coords, {
+        color: color,
+        weight: 1,
+        fillColor: fillColor,
+        fillOpacity: fillOpacity
+      }).addTo(map);
+  
+      // popup thông tin
+      let popupContent = `
+        <b>${name}</b><br>
+        Diện tích: ${area} ha<br>
+        Cây: ${crop}<br>
+        Giai đoạn: ${stage}<br>
+        Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+      `;
+  
+      // nếu là cỏ thì thêm dòng số ngày đã qua
+      if (crop === "Cỏ" && harvestDateStr) {
+        const parts = harvestDateStr.split("/");
+        if (parts.length === 3) {
+          const harvestDate = new Date(parts[2], parts[1] - 1, parts[0]);
+          const today = new Date();
+          const diffDays = Math.floor((today - harvestDate) / (1000 * 60 * 60 * 24));
+          if (!isNaN(diffDays)) {
+            popupContent += `<br>Đã qua: ${diffDays} ngày`;
+          }
+        }
+      }
+  
+      poly.bindPopup(popupContent);
+  
+      polygons.push(poly);
+    });
+  
+    // vẽ lại nhãn nếu đang bật
+    drawLabels();
+  }
+
 
     // Lấy dữ liệu từ Google Sheets
     fetch(sheetUrl)
@@ -682,6 +747,7 @@
   </script>
 </body>
 </html>
+
 
 
 
