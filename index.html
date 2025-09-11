@@ -648,77 +648,77 @@
     }
     
     // Hàm vẽ dữ liệu từ Google Sheets
-    function drawData(rows) {
-      rows.forEach(row => {
-        const id = row[0];          // Mã lô
-        const crop = row[1];        // Loại cây trồng
-        const area = row[2];        // Diện tích
-        const coordsStr = row[3];   // Tọa độ polygon
-        const harvestDateStr = row[4]; // Ngày thu hoạch (dd/mm/yyyy)
-    
-        if (!coordsStr) return;
-        const coords = coordsStr.split(";").map(pt => {
-          const [lat, lng] = pt.split(",").map(Number);
-          return [lat, lng];
-        });
-    
-        let color = "green";
-        let fillColor = "green";
-        let fillOpacity = 0.4;
-    
-        // Xử lý riêng cho Cỏ
-        if (crop === "Cỏ") {
-          fillColor = "yellow";
-          fillOpacity = 0.4;
-    
-          if (harvestDateStr) {
-            const harvestDate = parseDate_ddmmyyyy(harvestDateStr);
-            const today = new Date();
-    
-            if (harvestDate) {
-              const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
-    
-              if (!isNaN(diffDays)) {
-                // Tính độ trong suốt dựa trên tỉ lệ ngày/90
-                let ratio = diffDays / 90;
-                fillOpacity = Math.max(0.1, Math.min(ratio, 1));
-    
-                // Nếu đủ 90 ngày mà chưa thu hoạch => viền đỏ
-                if (diffDays >= 90) {
-                  color = "red";
-                  fillOpacity = 1;
-                }
-              }
+    function drawData(filterCrop) {
+  polygons.forEach(p => map.removeLayer(p));
+  polygons = [];
+
+  rowsData.forEach(row => {
+    const id = row.c[0]?.v;          // Mã lô
+    const area = row.c[1]?.v;        // Diện tích
+    const crop = row.c[2]?.v;        // Loại cây
+    const stage = row.c[3]?.v;       // Giai đoạn
+    const harvestDateStr = row.c[4]?.v; // Ngày thu hoạch (dd/mm/yyyy)
+    const coords = JSON.parse(row.c[5]?.v); // tọa độ polygon (mình giả sử lưu JSON trong sheet)
+
+    if (!coords) return;
+    if (filterCrop && filterCrop !== "all" && crop !== filterCrop) return;
+
+    let color = "blue";
+    let fillColor = "gray";
+    let fillOpacity = 0.6;
+
+    // === xử lý riêng cho cỏ ===
+    if (crop === "Cỏ") {
+      fillColor = "yellow";
+      fillOpacity = 0.4;
+
+      if (harvestDateStr) {
+        const harvestDate = parseDate_ddmmyyyy(harvestDateStr);
+        const today = new Date();
+
+        if (harvestDate) {
+          const diffDays = (today - harvestDate) / (1000 * 60 * 60 * 24);
+          if (!isNaN(diffDays)) {
+            let ratio = diffDays / 90;
+            fillOpacity = Math.max(0.1, Math.min(ratio, 1));
+            if (diffDays >= 90) {
+              color = "red";
+              fillOpacity = 1;
             }
           }
         }
-    
-        // Tạo polygon
-        const poly = L.polygon(coords, {
-          color: color,
-          weight: 2,
-          fillColor: fillColor,
-          fillOpacity: fillOpacity
-        }).addTo(map);
-    
-        // Gán popup thông tin
-        poly.bindPopup(`
-          <b>Lô: ${id}</b><br>
-          Cây trồng: ${crop}<br>
-          Diện tích: ${area} ha<br>
-          Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
-        `);
-      });
+      }
+    } else if (crop === "Sắn") {
+      fillColor = "green";
+    } else if (crop === "Ngô") {
+      fillColor = "orange";
+    } else if (crop === "Đất trống") {
+      fillColor = "brown";
+      fillOpacity = 0.3;
     }
 
-    // Lấy dữ liệu từ Google Sheets
-    fetch(sheetUrl)
-      .then(res => res.text())
-      .then(data => {
-        const json = JSON.parse(data.substr(47).slice(0, -2));
-        rowsData = json.table.rows;
-        drawData("all");
-      });
+    const poly = L.polygon(coords, {
+      color,
+      weight: 1,
+      fillColor,
+      fillOpacity
+    }).addTo(map);
+
+    let popupContent = `
+      <b>${id}</b><br>
+      Diện tích: ${area} ha<br>
+      Cây: ${crop}<br>
+      Giai đoạn: ${stage}<br>
+      Ngày thu hoạch: ${harvestDateStr || "Chưa có"}
+    `;
+
+    poly.bindPopup(popupContent);
+    polygons.push(poly);
+  });
+
+  drawLabels();
+}
+
 
     // Chọn crop
     document.querySelectorAll("[data-crop]").forEach(btn => {
@@ -745,6 +745,7 @@
   </script>
 </body>
 </html>
+
 
 
 
