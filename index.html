@@ -71,8 +71,24 @@
   /* ===== MENU MOBILE ===== */
   @media (max-width: 768px) {
     .toggle-labels-btn {
-    font-size: 16px;
-    padding: 10px 14px;}
+      background: #fff;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      margin-bottom: 40px; /* đẩy lên khỏi zoom control */
+    }
+    .toggle-labels-btn:hover {
+      background: #f0f0f0;
+    }
+    #infoBox {
+    bottom: 80px;  /* đẩy lên cao hơn chút cho điện thoại */
+    left: 5px;
+    font-size: 13px;
+    padding: 6px 10px;
+    }
     #menu .menu {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -281,7 +297,7 @@
     }
 
     // Nút toggle nhãn
-    const toggleBtn = L.control({position: 'topright'});
+    const toggleBtn = L.control({position: 'bottomright'});
     toggleBtn.onAdd = function () {
       const btn = L.DomUtil.create('button', 'toggle-labels-btn');
       btn.innerHTML = "👁️ Hiện nhãn";
@@ -421,6 +437,7 @@
   <div id="infoBox" style="display:none;">🌱 Cỏ chưa thu hoạch: 0 ha</div>
 </body>
 </html>
+
 
 
 
