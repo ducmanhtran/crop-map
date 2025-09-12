@@ -74,8 +74,8 @@
 #taskPanel .task-btns{
   display:flex;
   justify-content:space-between;
-  gap:8px;
-  margin-bottom:8px;
+  gap:10px;
+  margin-top:8px;
 }
 
 #taskPanel .task-btns button{
@@ -83,8 +83,9 @@
   padding:8px 0;
   border:none;
   border-radius:6px;
-  cursor:pointer;
+  font-size:15px;
   font-weight:600;
+  cursor:pointer;
   background:#007bff;
   color:#fff;
   transition:background 0.3s;
@@ -93,6 +94,7 @@
 #taskPanel .task-btns button:hover{
   background:#0056b3;
 }
+
 
 #taskList{
   max-height:300px;
@@ -103,7 +105,7 @@
 @media (max-width:768px){
   #taskPanel{
     top:auto;
-    bottom:90px;   /* cao hơn footer/menu một chút */
+    bottom:200px;   /* cao hơn footer/menu một chút */
     right:5px;
     width:90%;     /* rộng hơn cho dễ bấm */
     left:5%;
@@ -379,6 +381,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
