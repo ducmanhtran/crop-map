@@ -159,7 +159,6 @@ if(filterCrop==="all"){
 }
 
 const poly=L.polygon(coords,{color:color,weight:weight,fillColor:fillColor,fillOpacity:fillOpacity}).addTo(polygonGroup);
-const plantDate = parseDate_fromSheet(dateStr);
 const displayDate = plantDate ? `${plantDate.getUTCDate()}/${plantDate.getUTCMonth()+1}/${plantDate.getUTCFullYear()}` : "Chưa có";
 poly.bindPopup(`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${displayDate}`);
 poly.myTooltip=L.tooltip({permanent:true,direction:'center',className:'custom-label'}).setContent(`${name}<br>${area} ha`).setLatLng(poly.getBounds().getCenter());
@@ -205,5 +204,6 @@ document.querySelectorAll("#menu .menu>li>button").forEach(btn=>{
 </script>
 </body>
 </html>
+
 
 
