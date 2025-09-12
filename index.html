@@ -41,7 +41,73 @@
 #taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
 #taskPanel label{font-weight:bold;}
 #taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;
+/* ===== TASK PANEL ===== */
+#taskPanel{
+  position:fixed;
+  top:60px;
+  right:10px;
+  width:300px;
+  background:rgba(255,255,255,0.98);
+  border:1px solid #ccc;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  z-index:1200;
+  display:none;
+  font-family:Arial,sans-serif;
+}
 
+#taskPanel .panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 14px;
+  font-weight:bold;
+  font-size:16px;
+  background:#007bff;
+  color:#fff;
+  border-top-left-radius:8px;
+  border-top-right-radius:8px;
+}
+
+#closeTasksBtn{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:18px;
+  cursor:pointer;
+}
+
+#taskPanel .task-content{
+  max-height:250px;
+  overflow:auto;
+  padding:10px 14px;
+  font-size:14px;
+  line-height:1.4;
+}
+
+#taskPanel .date-label{
+  display:block;
+  margin:8px 14px 4px;
+  font-weight:bold;
+}
+
+#taskDate{
+  width:calc(100% - 28px);
+  margin:0 14px 12px;
+  padding:6px 8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
+@media (max-width:768px){
+  #taskPanel{
+    top:auto;
+    bottom:120px;  /* đẩy xuống thêm để không che menu */
+    right:5px;
+    left:auto;
+    width:90%;
+  }
+}
 
 
 </style>
@@ -78,6 +144,13 @@
 <div id="map"></div>
 <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
 <div id="infoBox" style="display:none;"></div>
+
+<div id="taskPanel">
+  <div class="panel-header">
+    <span>Công việc hàng ngày</span>
+    <button id="closeTasksBtn">✖</button>
+  </div>
+
   <div id="taskList" class="task-content">
     <!-- Danh sách công việc sẽ được load tự động -->
   </div>
@@ -234,90 +307,33 @@ if(window.innerWidth<=768){
     });
   });
 }
-/* ===== TASK POPUP ===== */
 
-// popup rỗng toàn cục để có thể cập nhật nội dung
-let taskPopup = L.popup({maxWidth:300});
+// TASK PANEL
+const taskPanel = document.getElementById("taskPanel");
+const taskDateInput = document.getElementById("taskDate");
+const taskListDiv = document.getElementById("taskList");
 
-// khi bấm menu Công việc hàng ngày
+// click button daily task
 document.getElementById("dailyTaskBtn").addEventListener("click",function(){
-  // ngày hôm nay
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth()+1).padStart(2,'0');
-  const dd = String(today.getDate()).padStart(2,'0');
-  const todayStr = `${yyyy}-${mm}-${dd}`;
-
-  showTasksPopup(todayStr);
+  taskPanel.style.display = "block";
 });
-
-// tải dữ liệu sheet công việc
+taskDateInput.addEventListener("change", showTasks);
+  // nút đóng
+document.getElementById("closeTasksBtn").addEventListener("click",function(){
+  taskPanel.style.display="none";
+  highlightLayers.forEach(l=>polygonGroup.removeLayer(l));
+  highlightLayers=[];
+  taskListDiv.innerHTML="";
+});
+// fetch task sheet
 fetch(sheetTaskUrl)
-  .then(r=>r.text())
-  .then(t=>{
-    const m=t.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-    if(m) taskData=JSON.parse(m[1]).table.rows;
+  .then(res => res.text())
+  .then(data => {
+    const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+    if(match){
+      taskData = JSON.parse(match[1]).table.rows;
+    }
   });
-
-// hàm dựng nội dung popup
-function popupContent(dateStr){
-  const d = new Date(dateStr);
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const yyyy = d.getFullYear();
-
-  const tasks = getTasksForDate(dateStr);
-
-  return `
-    <div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.4;">
-      <strong>Công việc hàng ngày – ${dd}/${mm}/${yyyy}</strong><br>
-      ${tasks}
-      <label style="font-weight:bold;display:block;margin-top:6px;">Chọn ngày:</label>
-      <input type="date" id="taskDate" value="${dateStr}"
-             style="width:100%;margin-top:4px;padding:4px 6px;border:1px solid #ccc;border-radius:4px;">
-    </div>
-    <script>
-      document.getElementById('taskDate').addEventListener('change',function(){
-         parent.showTasksPopup(this.value);
-      });
-    </script>
-  `;
-}
-
-// trả về danh sách công việc từ sheet cho 1 ngày
-function getTasksForDate(dateStr){
-  const d = new Date(dateStr);
-  const sameDay = row=>{
-    const [stt,dateSheet,lot,content,quantity]=row.c.map(c=>c?.v);
-    const ds = parseTaskDate(dateSheet);
-    return ds && ds.toDateString()===d.toDateString();
-  };
-  const todayTasks = taskData.filter(sameDay);
-  if(!todayTasks.length) return '<i>Không có công việc</i>';
-
-  let lotMap={};
-  todayTasks.forEach(r=>{
-    const [stt,dateSheet,lot,content,quantity]=r.c.map(c=>c?.v);
-    if(!lot) return;
-    if(!lotMap[lot]) lotMap[lot]=[];
-    lotMap[lot].push(`${content} (${quantity})`);
-  });
-
-  let html='';
-  for(const lot in lotMap){
-    html += `<b>Lô ${lot}</b><br>` + lotMap[lot].map(x=>'- '+x).join('<br>') + '<hr>';
-  }
-  return html;
-}
-
-// hiển thị popup tại tâm bản đồ
-function showTasksPopup(dateStr){
-  taskPopup
-    .setLatLng(map.getCenter())
-    .setContent(popupContent(dateStr))
-    .openOn(map); // Leaflet tự thêm nút X và tự đóng khi click ra ngoài
-}
-
 
 // handle date change
 function showTasks(){
@@ -373,8 +389,6 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
-
-
 
 
 
