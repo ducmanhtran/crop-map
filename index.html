@@ -11,229 +11,177 @@
 
   <style>
   /* ===== MENU NGANG ===== */
-  #menu {
-    background: linear-gradient(90deg, #007bff, #0056b3);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    position: relative;
-    z-index: 1000;
-    font-family: Arial, sans-serif;
-  }
-  #menu .menu { list-style: none; margin:0; padding:0; display:flex; justify-content:center; }
-  #menu .menu > li { position: relative; }
-  #menu button {
-    background:none; border:none; padding:14px 20px; font-size:15px;
-    color:#fff; font-weight:600; cursor:pointer; transition:background 0.3s;
-    display:flex; align-items:center; gap:6px;
-  }
-  #menu button:hover { background: rgba(0,0,0,0.05); color:#007bff; }
-  #menu .submenu {
-    display:none; position:absolute; top:100%; left:0; background:#fff;
-    list-style:none; margin:0; padding:6px 0; box-shadow:0 2px 6px rgba(0,0,0,0.25);
-    min-width:200px; border-radius:4px;
-  }
-  #menu .submenu li { text-align:left; }
-  #menu .submenu button { width:100%; text-align:left; padding:10px 14px; font-size:14px; color:#333; background:none; border:none; }
-  #menu .submenu button:hover { background:#f0f0f0; color:#007bff; }
-  #menu .menu > li:hover > .submenu { display:block; }
+  #menu { background: linear-gradient(90deg,#007bff,#0056b3); box-shadow:0 2px 6px rgba(0,0,0,0.25); position:relative; z-index:1000; font-family:Arial,sans-serif; }
+  #menu .menu { list-style:none;margin:0;padding:0; display:flex; justify-content:center; }
+  #menu .menu>li { position:relative; }
+  #menu button { background:none;border:none;padding:14px 20px;font-size:15px;color:#fff;font-weight:600;cursor:pointer;transition:background 0.3s;display:flex;align-items:center;gap:6px;}
+  #menu button:hover{background:rgba(0,0,0,0.05);color:#007bff;}
+  #menu .submenu { display:none;position:absolute;top:100%;left:0;background:#fff;list-style:none;margin:0;padding:6px 0;box-shadow:0 2px 6px rgba(0,0,0,0.25);min-width:200px;border-radius:4px; }
+  #menu .submenu li{text-align:left;}
+  #menu .submenu button{width:100%;text-align:left;padding:10px 14px;font-size:14px;color:#333;background:none;border:none;}
+  #menu .submenu button:hover{background:#f0f0f0;color:#007bff;}
+  #menu .menu>li:hover>.submenu{display:block;}
 
-  /* ===== MENU MOBILE ===== */
-  @media (max-width: 768px) {
-    #infoBox { bottom: 80px; left: 5px; font-size:13px; padding:6px 10px; }
-    #menu .menu { display:grid; grid-template-columns:1fr 1fr; grid-gap:4px; padding:4px; }
-    #menu .menu > li { border:1px solid rgba(0,0,0,0.1); border-radius:6px; background:rgba(255,255,255,0.6);}
-    #menu button { width:100%; justify-content:center; padding:16px 10px; font-size:15px; text-align:center; color:#000; }
-    #menu button i { display:block; font-size:20px; margin-bottom:4px; }
-    #menu .submenu { display:none; position:static; box-shadow:none; background:#fff; margin-top:2px; border-radius:4px; }
-    #menu .submenu button { text-align:left; padding:10px 14px; font-size:14px; color:#333; }
-    #menu .submenu button:hover { background:#f0f0f0; color:#007bff; }
-    #menu .menu > li.open > .submenu { display:block; }
+  @media(max-width:768px){
+    #infoBox{bottom:80px;left:5px;font-size:13px;padding:6px 10px;}
+    #menu .menu{display:grid;grid-template-columns:1fr 1fr;grid-gap:4px;padding:4px;}
+    #menu .menu>li{border:1px solid rgba(0,0,0,0.1);border-radius:6px;background:rgba(255,255,255,0.6);}
+    #menu button{width:100%;justify-content:center;padding:16px 10px;font-size:15px;text-align:center;color:#000;}
+    #menu button i{display:block;font-size:20px;margin-bottom:4px;}
+    #menu .submenu{display:none;position:static;box-shadow:none;background:#fff;margin-top:2px;border-radius:4px;}
+    #menu .submenu button{text-align:left;padding:10px 14px;font-size:14px;color:#333;}
+    #menu .submenu button:hover{background:#f0f0f0;color:#007bff;}
+    #menu .menu>li.open>.submenu{display:block;}
   }
 
-  /* ===== MAP + FOOTER ===== */
-  #map { height: calc(100vh - 100px); width:100%; margin:0; padding:0; }
-  #footerTitle {
-    position: fixed; bottom:0; left:0; width:100%; margin:0;
-    padding:4px 6px; background: rgba(255,255,255,0.85); text-align:center; font-size:13px;
-    box-shadow:0 -1px 4px rgba(0,0,0,0.15); z-index:1000;
-  }
-
-  /* ===== LABEL & TOGGLE ===== */
-  .custom-label { font-weight:200; font-size:13px; color:#000; text-align:center; white-space:nowrap; }
-  .toggle-labels-btn {
-    background:#fff; border:1px solid #bbb; border-radius:6px;
-    padding:6px 10px; font-size:14px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.15); margin-bottom:40px;
-  }
-  .toggle-labels-btn:hover { background:#f0f0f0; }
-  #infoBox {
-    position: fixed; bottom:40px; left:10px; background: rgba(255,255,255,0.9);
-    border:1px solid #ccc; padding:8px 12px; font-size:14px; font-weight:bold;
-    border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:1200;
-  }
+  #map{height:calc(100vh - 100px);width:100%;margin:0;padding:0;}
+  #footerTitle{position:fixed;bottom:0;left:0;width:100%;margin:0;padding:4px 6px;background:rgba(255,255,255,0.85);text-align:center;font-size:13px;box-shadow:0 -1px 4px rgba(0,0,0,0.15);z-index:1000;}
+  .custom-label{font-weight:200;font-size:13px;color:#000;text-align:center;white-space:nowrap;}
+  .toggle-labels-btn{background:#fff;border:1px solid #bbb;border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.15);margin-bottom:40px;}
+  .toggle-labels-btn:hover{background:#f0f0f0;}
+  #infoBox{position:fixed;bottom:40px;left:10px;background:rgba(255,255,255,0.9);border:1px solid #ccc;padding:8px 12px;font-size:14px;font-weight:bold;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;}
   </style>
 </head>
 <body>
-  <!-- MENU -->
-  <nav id="menu">
-    <ul class="menu">
-      <li>
-        <button>🌱 Cây trồng ▾</button>
-        <ul class="submenu">
-          <li><button data-crop="all">🌍 Tổng thể</button></li>
-          <li><button data-crop="Cỏ">🌱 Cỏ</button></li>
-          <li><button data-crop="Ngô">🌽 Ngô</button></li>
-          <li><button data-crop="Sắn">🥔 Sắn</button></li>
-          <li><button data-crop="Đất trống">⬜ Đất trống</button></li>
-        </ul>
-      </li>
-      <li>
-        <button>🛠️ Công việc ▾</button>
-        <ul class="submenu">
-          <li><button>📅 Công việc hàng ngày</button></li>
-          <li><button>📝 Lưu ý công việc</button></li>
-          <li><button>📊 Báo cáo tuần</button></li>
-        </ul>
-      </li>
-      <li>
-        <button>🏗️ Hạ tầng ▾</button>
-        <ul class="submenu">
-          <li><button>💧 Hệ thống tưới</button></li>
-          <li><button>🚜 Máy móc</button></li>
-        </ul>
-      </li>
-      <li>
-        <button>📜 Pháp lý ▾</button>
-        <ul class="submenu">
-          <li><button>📖 Sổ đỏ</button></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
+<nav id="menu">
+<ul class="menu">
+<li><button>🌱 Cây trồng ▾</button>
+<ul class="submenu">
+<li><button data-crop="all">🌍 Tổng thể</button></li>
+<li><button data-crop="Cỏ">🌱 Cỏ</button></li>
+<li><button data-crop="Ngô">🌽 Ngô</button></li>
+<li><button data-crop="Sắn">🥔 Sắn</button></li>
+<li><button data-crop="Đất trống">⬜ Đất trống</button></li>
+</ul></li>
+<li><button>🛠️ Công việc ▾</button>
+<ul class="submenu">
+<li><button>📅 Công việc hàng ngày</button></li>
+<li><button>📝 Lưu ý công việc</button></li>
+<li><button>📊 Báo cáo tuần</button></li>
+</ul></li>
+<li><button>🏗️ Hạ tầng ▾</button>
+<ul class="submenu">
+<li><button>💧 Hệ thống tưới</button></li>
+<li><button>🚜 Máy móc</button></li>
+</ul></li>
+<li><button>📜 Pháp lý ▾</button>
+<ul class="submenu">
+<li><button>📖 Sổ đỏ</button></li>
+</ul></li>
+</ul>
+</nav>
 
-  <!-- MAP -->
-  <div id="map"></div>
-  <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
-  <div id="infoBox" style="display:none;"></div>
+<div id="map"></div>
+<h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
+<div id="infoBox" style="display:none;"></div>
 
-  <script>
-  window.onload = function() {
-    const sheetCropsUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
+<script>
+window.onload=function(){
+const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
+let rowsData=[],currentFilter="all",labelsVisible=false;
 
-    let rowsData = [], currentFilter="all", labelsVisible=false;
-    const polygonGroup = L.layerGroup().addTo(map);
+function parseDate_fromSheet(str){
+if(!str)return null;
+str=String(str).trim();
+if(str.includes("/")){const p=str.split("/");if(p.length===3)return new Date(p[2],p[1]-1,p[0]);}
+const m=str.match(/Date\((\d+),(\d+),(\d+)\)/);
+if(m)return new Date(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
+return null;
+}
+function interpolateColor(c1,c2,t){
+const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16);
+const r=Math.round(((b>>16)&0xFF)*t+((a>>16)&0xFF)*(1-t));
+const g=Math.round(((b>>8)&0xFF)*t+((a>>8)&0xFF)*(1-t));
+const bl=Math.round((b&0xFF)*t+(a&0xFF)*(1-t));
+return `rgb(${r},${g},${bl})`;
+}
 
-    function parseDate_fromSheet(str){
-      if(!str) return null;
-      str = String(str).trim();
-      if(str.includes("/")){ const p=str.split("/"); if(p.length===3) return new Date(p[2],p[1]-1,p[0]);}
-      const m=str.match(/Date\((\d+),(\d+),(\d+)\)/);
-      if(m) return new Date(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
-      return null;
-    }
+// Khởi tạo map trước
+const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
 
-    function interpolateColor(c1,c2,t){
-      const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16);
-      const r=Math.round(((b>>16)&0xFF)*t+((a>>16)&0xFF)*(1-t));
-      const g=Math.round(((b>>8)&0xFF)*t+((a>>8)&0xFF)*(1-t));
-      const bl=Math.round((b&0xFF)*t+(a&0xFF)*(1-t));
-      return `rgb(${r},${g},${bl})`;
-    }
+const polygonGroup=L.layerGroup().addTo(map);
 
-    const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
-    L.control.zoom({position:'bottomright'}).addTo(map);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+const toggleBtn=L.control({position:'bottomright'});
+toggleBtn.onAdd=function(){
+const btn=L.DomUtil.create('button','toggle-labels-btn');
+btn.innerHTML="👁️ Hiện nhãn";
+btn.onclick=function(){labelsVisible=!labelsVisible;btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";polygonGroup.eachLayer(poly=>labelsVisible?poly.openTooltip():poly.closeTooltip());};
+return btn;};
+toggleBtn.addTo(map);
 
-    const toggleBtn=L.control({position:'bottomright'});
-    toggleBtn.onAdd=function(){
-      const btn=L.DomUtil.create('button','toggle-labels-btn');
-      btn.innerHTML="👁️ Hiện nhãn";
-      btn.onclick=function(){
-        labelsVisible=!labelsVisible;
-        btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
-        polygonGroup.eachLayer(poly=>labelsVisible?poly.openTooltip():poly.closeTooltip());
-      };
-      return btn;
-    };
-    toggleBtn.addTo(map);
+function drawData(filterCrop){
+currentFilter=filterCrop;
+polygonGroup.clearLayers();
+let totalGrassArea=0,totalCassavaArea=0;
+const today=new Date();
+rowsData.forEach(row=>{
+const [name,areaRaw,crop,stage,dateStr,coordsStr]=row.c.map(c=>c?.v);
+const area=parseFloat(areaRaw)||0;
+if(!coordsStr)return;
+if(filterCrop!=="all"&&crop!==filterCrop)return;
+const coords=JSON.parse(coordsStr);
+let color="blue",fillColor="gray",fillOpacity=0.6,weight=0.5;
 
-    function drawData(filterCrop){
-      currentFilter=filterCrop;
-      polygonGroup.clearLayers();
-      let totalGrassArea=0,totalCassavaArea=0;
-      const today=new Date();
+if(filterCrop==="all"){
+if(crop==="Cỏ") fillColor="#FFFF99";
+else if(crop==="Ngô") fillColor="orange";
+else if(crop==="Sắn") fillColor="#99FF99";
+else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
+}else{
+if(crop==="Cỏ"){
+const harvestDate=parseDate_fromSheet(dateStr);
+let t=0;
+if(harvestDate){
+const days=Math.floor((today-harvestDate)/(1000*60*60*24));
+t=Math.min(Math.max(days/90,0),1);
+fillOpacity=Math.max(0.3,t);
+if(days>=90){color="red";weight=2;totalGrassArea+=area;}
+}else fillOpacity=0.3;
+fillColor=interpolateColor("#FFFFCC","#FFD700",t);
+}else if(crop==="Ngô") fillColor="orange";
+else if(crop==="Sắn"){
+const plantedDate=parseDate_fromSheet(dateStr);
+let t=0;
+if(plantedDate){
+const months=(today-plantedDate)/(1000*60*60*24*30);
+t=Math.min(Math.max(months/10,0),1);
+fillOpacity=Math.max(0.3,t);
+if(months>=10){color="red";weight=2;totalCassavaArea+=area;}
+}else fillOpacity=0.3;
+fillColor=interpolateColor("#CCFFCC","#009900",t);
+}else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
+}
 
-      rowsData.forEach(row=>{
-        const [name,areaRaw,crop,stage,dateStr,coordsStr]=row.c.map(c=>c?.v);
-        const area=parseFloat(areaRaw)||0;
-        if(!coordsStr) return;
-        if(filterCrop!=="all"&&crop!==filterCrop) return;
-        const coords=JSON.parse(coordsStr);
-        let color="blue",fillColor="gray",fillOpacity=0.6,weight=0.5;
+const poly=L.polygon(coords,{color,weight,fillColor,fillOpacity}).bindPopup(
+`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${dateStr||"Chưa có"}`
+);
+poly.bindTooltip(`${name}<br>${area} ha`,{permanent:labelsVisible,className:'custom-label',direction:'center'});
+polygonGroup.addLayer(poly);
+});
 
-        if(filterCrop==="all"){
-          if(crop==="Cỏ") fillColor="#FFFF99";
-          else if(crop==="Ngô") fillColor="orange";
-          else if(crop==="Sắn") fillColor="#99FF99";
-          else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
-        } else {
-          if(crop==="Cỏ"){
-            const harvestDate=parseDate_fromSheet(dateStr);
-            let t=0;
-            if(harvestDate){
-              const days=Math.floor((today-harvestDate)/(1000*60*60*24));
-              t=Math.min(Math.max(days/90,0),1);
-              fillOpacity=Math.max(0.3,t);
-              if(days>=90){color="red";weight=2;totalGrassArea+=area;}
-            } else fillOpacity=0.3;
-            fillColor=interpolateColor("#FFFFCC","#FFD700",t);
-          } else if(crop==="Ngô") fillColor="orange";
-          else if(crop==="Sắn"){
-            const plantedDate=parseDate_fromSheet(dateStr);
-            let t=0;
-            if(plantedDate){
-              const months=(today-plantedDate)/(1000*60*60*24*30);
-              t=Math.min(Math.max(months/10,0),1);
-              fillOpacity=Math.max(0.3,t);
-              if(months>=10){color="red";weight=2;totalCassavaArea+=area;}
-            } else fillOpacity=0.3;
-            fillColor=interpolateColor("#CCFFCC","#009900",t);
-          } else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
-        }
+const box=document.getElementById("infoBox");
+if(filterCrop==="Cỏ"){box.style.display="block";box.innerText=`🌱 Cỏ chưa thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
+else if(filterCrop==="Sắn"){box.style.display="block";box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
+else box.style.display="none";
+}
 
-        const poly=L.polygon(coords,{color,weight,fillColor,fillOpacity}).bindPopup(
-          `<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${dateStr||"Chưa có"}`
-        );
-        poly.bindTooltip(`${name}<br>${area} ha`,{permanent:labelsVisible,className:'custom-label',direction:'center'});
-        polygonGroup.addLayer(poly);
-      });
+fetch(sheetCropsUrl).then(res=>res.text()).then(data=>{
+const match=data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+if(!match){console.error("Không parse dữ liệu");return;}
+rowsData=JSON.parse(match[1]).table.rows;
+drawData("all");
+}).catch(err=>console.error("Lỗi fetch Google Sheet:",err));
 
-      const box=document.getElementById("infoBox");
-      if(filterCrop==="Cỏ"){box.style.display="block";box.innerText=`🌱 Cỏ chưa thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
-      else if(filterCrop==="Sắn"){box.style.display="block";box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
-      else box.style.display="none";
-    }
+document.querySelectorAll("[data-crop]").forEach(btn=>btn.addEventListener("click",()=>drawData(btn.getAttribute("data-crop"))));
 
-    fetch(sheetCropsUrl)
-      .then(res=>res.text())
-      .then(data=>{
-        const match=data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-        if(!match){console.error("Không parse dữ liệu");return;}
-        rowsData=JSON.parse(match[1]).table.rows;
-        drawData("all");
-      }).catch(err=>console.error("Lỗi fetch Google Sheet:",err));
-
-    document.querySelectorAll("[data-crop]").forEach(btn=>btn.addEventListener("click",()=>drawData(btn.getAttribute("data-crop"))));
-
-    if(window.innerWidth<=768){
-      document.querySelectorAll("#menu .menu > li > button").forEach(btn=>{
-        btn.addEventListener("click",function(e){
-          e.preventDefault();
-          const li=this.parentElement;
-          document.querySelectorAll("#menu .menu > li").forEach(item=>{if(item!==li)item.classList.remove("open");});
-          li.classList.toggle("open");
-        });
-      });
-    }
-  };
-  </script>
+if(window.innerWidth<=768){
+document.querySelectorAll("#menu .menu>li>button").forEach(btn=>{
+btn.addEventListener("click",function(e){e.preventDefault();const li=this.parentElement;document.querySelectorAll("#menu .menu>li").forEach(item=>{if(item!==li)item.classList.remove("open");});li.classList.toggle("open");});
+});
+}
+};
+</script>
 </body>
 </html>
