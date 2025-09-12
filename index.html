@@ -296,33 +296,9 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
   highlightLayers=[];
   taskListDiv.innerHTML="";
 });
-
-
-  taskListDiv.innerHTML="";
-  const lotTasksMap={};
-
-  dayTasks.forEach(row=>{
-    const [stt,dateStr,lot,content,quantity]=row.c.map(c=>c?.v);
-    if(!lot) return;
-    if(!lotTasksMap[lot]) lotTasksMap[lot]=[];
-    lotTasksMap[lot].push({content,quantity});
-  });
-
-  for(const lot in lotTasksMap){
-    // find polygon
-    const poly = polygons.find(p=>p.options.name===lot || p.myTooltip?.getContent()?.includes(lot));
-    if(poly){
-      const highlight = L.polygon(poly.getLatLngs(),{color:'red',weight:3,fill:false}).addTo(polygonGroup);
-      highlightLayers.push(highlight);
-    }
-
-    const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity})`).join("<br>");
-    taskListDiv.innerHTML += `<b>Lô ${lot}</b><br>${tasksHTML}<br><hr>`;
-  }
-});
-
 };
 </script>
 </body>
 </html>
+
 
