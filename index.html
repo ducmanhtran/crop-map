@@ -252,7 +252,6 @@ document.getElementById("dailyTaskBtn").addEventListener("click",function(){
 });
 
 // tải dữ liệu sheet công việc
-let taskData=[];
 fetch(sheetTaskUrl)
   .then(r=>r.text())
   .then(t=>{
@@ -374,6 +373,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
