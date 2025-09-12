@@ -322,13 +322,11 @@
               const days = Math.floor((today - harvestDate) / (1000*60*60*24));
               if (days < 0) {
                 fillOpacity = 0.3;
-                totalGrassArea += area;
               } else {
                 fillOpacity = Math.min(1, days / 90);
-                if (days >= 90) { color = "red"; weight = 2; }
+                if (days >= 90) { color = "red"; weight = 2; totalGrassArea += area;}
               }
             } else {
-              totalGrassArea += area;
             }
           } 
           else if (crop === "Ngô") {
@@ -437,4 +435,5 @@
   </script>
 </body>
 </html>
+
 
