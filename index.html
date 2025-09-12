@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
+/* ===== MENU ===== */
 #menu{background:linear-gradient(90deg,#007bff,#0056b3);box-shadow:0 2px 6px rgba(0,0,0,0.25);position:relative;z-index:1000;font-family:Arial,sans-serif;}
 #menu .menu{list-style:none;margin:0;padding:0;display:flex;justify-content:center;}
 #menu .menu>li{position:relative;}
@@ -30,8 +31,10 @@
   #menu .submenu button:hover{background:#f0f0f0;color:#007bff;}
   #menu .menu>li.open>.submenu{display:block;}
 }
+/* ===== MAP + FOOTER ===== */
 #map{height:calc(100vh - 100px);width:100%;margin:0;padding:0;}
 #footerTitle{position:fixed;bottom:0;left:0;width:100%;margin:0;padding:4px 6px;background:rgba(255,255,255,0.85);text-align:center;font-size:13px;box-shadow:0 -1px 4px rgba(0,0,0,0.15);z-index:1000;}
+/* ===== LABEL & TOGGLE ===== */
 .custom-label{font-weight:200;font-size:13px;color:#000;text-align:center;white-space:nowrap;}
 .toggle-labels-btn{background:#fff;border:1px solid #bbb;border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.15);margin-bottom:40px;}
 .toggle-labels-btn:hover{background:#f0f0f0;}
@@ -61,7 +64,7 @@
 <li><button>🚜 Máy móc</button></li>
 </ul></li>
 <li><button>📜 Pháp lý ▾</button>
-<ul class="submenu">
+<ul>
 <li><button>📖 Sổ đỏ</button></li>
 </ul></li>
 </ul>
@@ -72,7 +75,7 @@
 <div id="infoBox" style="display:none;"></div>
 
 <script>
-window.onload = function(){
+window.onload=function(){
 const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
 let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
 
@@ -98,8 +101,8 @@ const btn=L.DomUtil.create('button','toggle-labels-btn');
 btn.innerHTML="👁️ Hiện nhãn";
 btn.onclick=function(){
 labelsVisible=!labelsVisible;
-btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
 polygons.forEach(p=>{if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip);});
+btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
 };
 return btn;
 };
@@ -124,10 +127,20 @@ const plantedDate=parseDate_fromSheet(dateStr);
 
 if(filterCrop!=="all" && plantedDate){
 const months=(today-plantedDate)/(1000*60*60*24*30);
-if(crop==="Cỏ" && months>=3){color="red";weight=2;fillOpacity=1;totalGrassArea+=area;}
-else if(crop==="Sắn" && months>=10){color="red";weight=2;fillOpacity=1;totalCassavaArea+=area;}
-else if(crop==="Ngô" && months>=5){color="red";weight=2;fillOpacity=1;totalCornArea+=area;}
-else {fillOpacity=Math.min(0.3+months/((crop==="Cỏ")?3:(crop==="Sắn")?10:5)*0.7,0.9);}
+let threshold=0;
+if(crop==="Cỏ") threshold=3;
+else if(crop==="Sắn") threshold=10;
+else if(crop==="Ngô") threshold=5;
+
+if(months>=threshold){
+color="red";weight=2;fillOpacity=1;
+if(crop==="Cỏ") totalGrassArea+=area;
+else if(crop==="Sắn") totalCassavaArea+=area;
+else if(crop==="Ngô") totalCornArea+=area;
+} else {
+fillOpacity=0.2+0.8*(months/threshold);
+if(fillOpacity>0.9) fillOpacity=0.9;
+}
 }
 
 // Màu cơ bản khi tổng thể
@@ -192,4 +205,3 @@ li.classList.toggle("open");
 </script>
 </body>
 </html>
-
