@@ -251,10 +251,10 @@ fetch(sheetTaskUrl)
 
 // handle date change
 function showTasks(){
-  console.log("selectedDate:", selectedDate.toDateString(), taskDateInput.value);
+
   const selectedDate = new Date(taskDateInput.value);
   if(!taskDateInput.value) return;
-
+  console.log("selectedDate:", selectedDate.toDateString(), taskDateInput.value);
   // xóa highlight cũ
   highlightLayers.forEach(l=>polygonGroup.removeLayer(l));
   highlightLayers = [];
@@ -304,6 +304,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
