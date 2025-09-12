@@ -319,15 +319,6 @@ function showTasksPopup(dateStr){
     .openOn(map); // Leaflet tự thêm nút X và tự đóng khi click ra ngoài
 }
 
-// fetch task sheet
-fetch(sheetTaskUrl)
-  .then(res => res.text())
-  .then(data => {
-    const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-    if(match){
-      taskData = JSON.parse(match[1]).table.rows;
-    }
-  });
 
 // handle date change
 function showTasks(){
@@ -383,6 +374,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
