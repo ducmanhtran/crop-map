@@ -40,7 +40,76 @@
 /* ===== TASK PANEL ===== */
 #taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
 #taskPanel label{font-weight:bold;}
-#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;}
+#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;
+/* ===== TASK PANEL ===== */
+#taskPanel{
+  position:fixed;
+  top:60px;
+  right:10px;
+  width:280px;
+  background:rgba(255,255,255,0.95);
+  border:1px solid #ccc;
+  padding:12px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  z-index:1200;
+  display:none;
+  font-size:14px;
+}
+
+#taskPanel label{
+  font-weight:bold;
+  display:block;
+  margin-bottom:6px;
+}
+
+#taskPanel input[type="date"]{
+  width:100%;
+  padding:6px 8px;
+  margin-bottom:10px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
+#taskPanel .task-btns{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+#taskPanel .task-btns button{
+  flex:1;
+  padding:8px 0;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+  background:#007bff;
+  color:#fff;
+  transition:background 0.3s;
+}
+
+#taskPanel .task-btns button:hover{
+  background:#0056b3;
+}
+
+#taskList{
+  max-height:300px;
+  overflow:auto;
+}
+
+/* --- Trên điện thoại: đẩy panel xuống thấp để không đè menu --- */
+@media (max-width:768px){
+  #taskPanel{
+    top:auto;
+    bottom:90px;   /* cao hơn footer/menu một chút */
+    right:5px;
+    width:90%;     /* rộng hơn cho dễ bấm */
+    left:5%;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -79,10 +148,12 @@
 <!-- TASK PANEL -->
 <div id="taskPanel">
   <label for="taskDate">Chọn ngày:</label>
-  <input type="date" id="taskDate" style="width:100%;margin-bottom:6px;padding:4px;">
-  <button id="viewTasksBtn" style="width:48%;margin-right:4%;padding:6px;">👁️ Xem</button>
-  <button id="closeTasksBtn" style="width:48%;padding:6px;">✖ Đóng</button>
-  <div id="taskList" style="margin-top:8px;"></div>
+  <input type="date" id="taskDate">
+  <div class="task-btns">
+    <button id="viewTasksBtn">👁️ Xem</button>
+    <button id="closeTasksBtn">✖ Đóng</button>
+  </div>
+  <div id="taskList"></div>
 </div>
 
 <script>
@@ -308,6 +379,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
