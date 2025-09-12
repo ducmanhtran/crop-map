@@ -41,6 +41,8 @@
 #taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
 #taskPanel label{font-weight:bold;}
 #taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;}
+#viewTasksBtn{width:100%;padding:6px 0;margin-bottom:6px;border-radius:6px;border:1px solid #007bff;background:#007bff;color:#fff;cursor:pointer;}
+#viewTasksBtn:hover{background:#0056b3;}
 </style>
 </head>
 <body>
@@ -80,6 +82,7 @@
 <div id="taskPanel">
   <label for="taskDate">Chọn ngày:</label>
   <input type="date" id="taskDate" style="width:100%;margin-bottom:6px;padding:4px;">
+  <button id="viewTasksBtn">Xem</button>
   <div id="taskList"></div>
 </div>
 
@@ -211,81 +214,4 @@ fetch(sheetCropsUrl)
 .catch(err=>console.error("Lỗi fetch Google Sheet:",err));
 
 // filter crop buttons
-document.querySelectorAll("[data-crop]").forEach(btn=>btn.addEventListener("click",function(){
-  drawData(this.getAttribute("data-crop"));
-}));
-
-// mobile menu
-if(window.innerWidth<=768){
-  document.querySelectorAll("#menu .menu>li>button").forEach(btn=>{
-    btn.addEventListener("click",function(e){
-      e.preventDefault();
-      const li=this.parentElement;
-      document.querySelectorAll("#menu .menu>li").forEach(item=>{if(item!==li) item.classList.remove("open");});
-      li.classList.toggle("open");
-    });
-  });
-}
-
-// TASK PANEL
-const taskPanel = document.getElementById("taskPanel");
-const taskDateInput = document.getElementById("taskDate");
-const taskListDiv = document.getElementById("taskList");
-
-// click button daily task
-document.getElementById("dailyTaskBtn").addEventListener("click",function(){
-  taskPanel.style.display = taskPanel.style.display==="none"?"block":"none";
-});
-
-// fetch task sheet
-fetch(sheetTaskUrl)
-  .then(res => res.text())
-  .then(data => {
-    const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-    if(match){
-      taskData = JSON.parse(match[1]).table.rows;
-    }
-  });
-
-// handle date change
-taskDateInput.addEventListener("change",function(){
-  const selectedDate = new Date(this.value);
-  if(!selectedDate) return;
-
-  // clear previous highlights
-  highlightLayers.forEach(l=>polygonGroup.removeLayer(l));
-  highlightLayers=[];
-
-  const dayTasks = taskData.filter(row=>{
-    const [stt,dateStr,lot,content,quantity]=row.c.map(c=>c?.v);
-    const date = parseTaskDate(dateStr);
-    return date && date.toDateString()===selectedDate.toDateString();
-  });
-
-  taskListDiv.innerHTML="";
-  const lotTasksMap={};
-
-  dayTasks.forEach(row=>{
-    const [stt,dateStr,lot,content,quantity]=row.c.map(c=>c?.v);
-    if(!lot) return;
-    if(!lotTasksMap[lot]) lotTasksMap[lot]=[];
-    lotTasksMap[lot].push({content,quantity});
-  });
-
-  for(const lot in lotTasksMap){
-    // find polygon
-    const poly = polygons.find(p=>p.options.name===lot || p.myTooltip?.getContent()?.includes(lot));
-    if(poly){
-      const highlight = L.polygon(poly.getLatLngs(),{color:'red',weight:3,fill:false}).addTo(polygonGroup);
-      highlightLayers.push(highlight);
-    }
-
-    const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity})`).join("<br>");
-    taskListDiv.innerHTML += `<b>Lô ${lot}</b><br>${tasksHTML}<br><hr>`;
-  }
-});
-
-};
-</script>
-</body>
-</html>
+document.querySelectorAll("[data-crop]").for
