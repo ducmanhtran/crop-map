@@ -73,7 +73,7 @@
 
 <script>
 window.onload = function(){
-const sheetCropsUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
+const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
 let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
 
 function parseDate_fromSheet(str){
@@ -91,6 +91,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&
 
 const polygonGroup=L.layerGroup().addTo(map);
 
+// Toggle nhãn
 const toggleBtn=L.control({position:'bottomright'});
 toggleBtn.onAdd=function(){
 const btn=L.DomUtil.create('button','toggle-labels-btn');
@@ -108,7 +109,7 @@ function drawData(filterCrop){
 currentFilter=filterCrop;
 polygonGroup.clearLayers();
 polygons=[];
-let totalGrassArea=0,totalCassavaArea=0;
+let totalGrassArea=0,totalCassavaArea=0,totalCornArea=0;
 const today=new Date();
 
 rowsData.forEach(row=>{
@@ -118,29 +119,36 @@ if(!coordsStr) return;
 if(filterCrop!=="all" && crop!==filterCrop) return;
 const coords=JSON.parse(coordsStr);
 
-let color="blue",fillColor="yellow",fillOpacity=0.6,weight=0.5;
-
-// Logic thời gian thu hoạch
+let color="blue",fillColor="gray",fillOpacity=0.6,weight=0.5;
 const plantedDate=parseDate_fromSheet(dateStr);
-if(plantedDate){
+
+if(filterCrop!=="all" && plantedDate){
 const months=(today-plantedDate)/(1000*60*60*24*30);
-if(crop==="Cỏ" && months>=3){color="red"; weight=2; fillOpacity=1; totalGrassArea+=area;}
-else if(crop==="Sắn" && months>=10){color="red"; weight=2; fillOpacity=1; totalCassavaArea+=area;}
+if(crop==="Cỏ" && months>=3){color="red";weight=2;fillOpacity=1;totalGrassArea+=area;}
+else if(crop==="Sắn" && months>=10){color="red";weight=2;fillOpacity=1;totalCassavaArea+=area;}
+else if(crop==="Ngô" && months>=5){color="red";weight=2;fillOpacity=1;totalCornArea+=area;}
+else {fillOpacity=Math.min(0.3+months/((crop==="Cỏ")?3:(crop==="Sắn")?10:5)*0.7,0.9);}
 }
 
-if(crop==="Ngô") fillColor="orange";
+// Màu cơ bản khi tổng thể
+if(filterCrop==="all"){
+if(crop==="Cỏ") fillColor="yellow";
 else if(crop==="Sắn") fillColor="#99FF99";
+else if(crop==="Ngô") fillColor="orange";
 else if(crop==="Đất trống") fillColor="brown";
-else if(crop==="Cỏ") fillColor="yellow";
+fillOpacity=0.6; weight=0.5; color="blue";
+} else {
+if(crop==="Cỏ") fillColor="yellow";
+else if(crop==="Sắn") fillColor="#99FF99";
+else if(crop==="Ngô") fillColor="orange";
+else if(crop==="Đất trống") fillColor="brown";
+}
 
 const poly=L.polygon(coords,{color,fillColor,fillOpacity,weight}).bindPopup(
 `<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${dateStr||"Chưa có"}`
 );
 
-// Tooltip hover
 poly.bindTooltip(`${name}<br>${area} ha`,{permanent:false,className:'custom-label',direction:'center'});
-
-// Tooltip permanent riêng để toggle
 poly.myTooltip=L.tooltip({permanent:true,className:'custom-label',direction:'center',offset:[0,0]})
 .setLatLng(poly.getBounds().getCenter()).setContent(`${name}<br>${area} ha`);
 if(labelsVisible) map.addLayer(poly.myTooltip);
@@ -152,6 +160,7 @@ polygons.push(poly);
 const box=document.getElementById("infoBox");
 if(filterCrop==="Cỏ"){box.style.display="block"; box.innerText=`🌱 Cỏ đến hạn thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
 else if(filterCrop==="Sắn"){box.style.display="block"; box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
+else if(filterCrop==="Ngô"){box.style.display="block"; box.innerText=`🌽 Ngô đến hạn thu hoạch: ${totalCornArea.toFixed(2)} ha`;}
 else box.style.display="none";
 }
 
