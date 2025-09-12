@@ -115,17 +115,21 @@ function parseDate_fromSheet(str){
   return null;
 }
 
-function parseTaskDate(str){
-  if(!str) return null;
-  const parts = str.split("/");
-  if(parts.length===3){
-    const day=parseInt(parts[0],10);
-    const month=parseInt(parts[1],10)-1;
-    const year=parseInt(parts[2],10);
-    return new Date(year,month,day);
+function parseTaskDate(dateStr){
+  if(!dateStr) return null;
+
+  // Bắt dạng: Date(YYYY,M,D)
+  const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+  if (m) {
+    // Tháng trong JS tính từ 0 nên giữ nguyên m[2]
+    return new Date(+m[1], +m[2], +m[3]);
   }
-  return null;
+
+  // Thử parse chuẩn ISO
+  const d = new Date(dateStr);
+  return isNaN(d) ? null : d;
 }
+
 
 // map
 const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
@@ -304,6 +308,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
