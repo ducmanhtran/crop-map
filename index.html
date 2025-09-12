@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <title>Bản đồ trồng trọt</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 <style>
 /* ===== MENU ===== */
 #menu{background:linear-gradient(90deg,#007bff,#0056b3);box-shadow:0 2px 6px rgba(0,0,0,0.25);position:relative;z-index:1000;font-family:Arial,sans-serif;}
@@ -64,7 +62,7 @@
 <li><button>🚜 Máy móc</button></li>
 </ul></li>
 <li><button>📜 Pháp lý ▾</button>
-<ul class="submenu">
+<ul>
 <li><button>📖 Sổ đỏ</button></li>
 </ul></li>
 </ul>
@@ -80,12 +78,27 @@ const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX
 let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
 
 function parseDate_fromSheet(str){
-if(!str) return null;
-str=String(str).trim();
-if(str.includes("/")){ const p=str.split("/"); if(p.length===3) return new Date(p[2],p[1]-1,p[0]); }
-const m=str.match(/Date\((\d+),(\d+),(\d+)\)/);
-if(m) return new Date(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
-return null;
+  if(!str) return null;
+  str=String(str).trim();
+  // dd/mm/yyyy
+  if(str.includes("/")){
+    const parts=str.split("/");
+    if(parts.length===3){
+      const day=parseInt(parts[0],10);
+      const month=parseInt(parts[1],10)-1;
+      const year=parseInt(parts[2],10);
+      return new Date(Date.UTC(year,month,day));
+    }
+  }
+  // Google JSON Date(yyyy,mm,dd)
+  const match=str.match(/Date\((\d+),(\d+),(\d+)\)/);
+  if(match){
+    const year=parseInt(match[1],10);
+    const month=parseInt(match[2],10);
+    const day=parseInt(match[3],10);
+    return new Date(Date.UTC(year,month,day));
+  }
+  return null;
 }
 
 const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
@@ -100,9 +113,9 @@ toggleBtn.onAdd=function(){
 const btn=L.DomUtil.create('button','toggle-labels-btn');
 btn.innerHTML="👁️ Hiện nhãn";
 btn.onclick=function(){
-labelsVisible=!labelsVisible;
-polygons.forEach(p=>{if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip);});
-btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
+  labelsVisible=!labelsVisible;
+  polygons.forEach(p=>{if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip);});
+  btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
 };
 return btn;
 };
@@ -123,86 +136,70 @@ if(filterCrop!=="all" && crop!==filterCrop) return;
 const coords=JSON.parse(coordsStr);
 
 let color="blue",fillColor="gray",fillOpacity=0.6,weight=0.5;
-const plantedDate=parseDate_fromSheet(dateStr);
 
-if(filterCrop!=="all" && plantedDate){
-const months=(today-plantedDate)/(1000*60*60*24*30);
-let threshold=0;
-if(crop==="Cỏ") threshold=3;
-else if(crop==="Sắn") threshold=10;
-else if(crop==="Ngô") threshold=5;
+const plantDate=parseDate_fromSheet(dateStr);
+const monthsElapsed=plantDate?((today-plantDate)/(1000*60*60*24*30)):0;
 
-if(months>=threshold){
-color="red";weight=2;fillOpacity=1;
-if(crop==="Cỏ") totalGrassArea+=area;
-else if(crop==="Sắn") totalCassavaArea+=area;
-else if(crop==="Ngô") totalCornArea+=area;
-} else {
-fillOpacity=0.2+0.8*(months/threshold);
-if(fillOpacity>0.9) fillOpacity=0.9;
-}
-}
-
-// Màu cơ bản khi tổng thể
 if(filterCrop==="all"){
-if(crop==="Cỏ") fillColor="yellow";
-else if(crop==="Sắn") fillColor="#99FF99";
-else if(crop==="Ngô") fillColor="orange";
-else if(crop==="Đất trống") fillColor="brown";
-fillOpacity=0.6; weight=0.5; color="blue";
-} else {
-if(crop==="Cỏ") fillColor="yellow";
-else if(crop==="Sắn") fillColor="#99FF99";
-else if(crop==="Ngô") fillColor="orange";
-else if(crop==="Đất trống") fillColor="brown";
+  if(crop==="Cỏ") fillColor="yellow";
+  else if(crop==="Ngô") fillColor="orange";
+  else if(crop==="Sắn") fillColor="green";
+  else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
+}else{
+  if(crop==="Cỏ"||crop==="Sắn"){
+    fillColor=(crop==="Cỏ")?"yellow":"green";
+    if(monthsElapsed>=3){color="red";weight=2;}
+    if(monthsElapsed>=3) crop==="Cỏ"?totalGrassArea+=area:totalCassavaArea+=area;
+    fillOpacity=Math.min(1,monthsElapsed/6); // mờ dần
+  }else if(crop==="Ngô"){
+    fillColor="orange";
+    if(monthsElapsed>=3){color="red";weight=2;totalCornArea+=area;}
+    fillOpacity=Math.min(1,monthsElapsed/6);
+  }else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
 }
 
-const poly=L.polygon(coords,{color,fillColor,fillOpacity,weight}).bindPopup(
-`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${dateStr||"Chưa có"}`
-);
-
-poly.bindTooltip(`${name}<br>${area} ha`,{permanent:false,className:'custom-label',direction:'center'});
-poly.myTooltip=L.tooltip({permanent:true,className:'custom-label',direction:'center',offset:[0,0]})
-.setLatLng(poly.getBounds().getCenter()).setContent(`${name}<br>${area} ha`);
+const poly=L.polygon(coords,{color:color,weight:weight,fillColor:fillColor,fillOpacity:fillOpacity}).addTo(polygonGroup);
+poly.bindPopup(`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${dateStr||"Chưa có"}`);
+poly.myTooltip=L.tooltip({permanent:true,direction:'center',className:'custom-label'}).setContent(`${name}<br>${area} ha`).setLatLng(poly.getBounds().getCenter());
 if(labelsVisible) map.addLayer(poly.myTooltip);
 
-polygonGroup.addLayer(poly);
 polygons.push(poly);
 });
 
 const box=document.getElementById("infoBox");
-if(filterCrop==="Cỏ"){box.style.display="block"; box.innerText=`🌱 Cỏ đến hạn thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
-else if(filterCrop==="Sắn"){box.style.display="block"; box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
-else if(filterCrop==="Ngô"){box.style.display="block"; box.innerText=`🌽 Ngô đến hạn thu hoạch: ${totalCornArea.toFixed(2)} ha`;}
-else box.style.display="none";
+if(filterCrop==="Cỏ") {box.style.display="block";box.innerText=`🌱 Cỏ đến hạn thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
+else if(filterCrop==="Sắn"){box.style.display="block";box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
+else if(filterCrop==="Ngô"){box.style.display="block";box.innerText=`🌽 Ngô đến hạn thu hoạch: ${totalCornArea.toFixed(2)} ha`;}
+else{box.style.display="none";}
 }
 
-// Fetch dữ liệu
-fetch(sheetCropsUrl).then(res=>res.text()).then(data=>{
+// fetch Google Sheet
+fetch(sheetCropsUrl)
+.then(res=>res.text())
+.then(data=>{
 const match=data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-if(!match){console.error("Không parse dữ liệu"); return;}
-rowsData=JSON.parse(match[1]).table.rows;
-drawData("all");
-}).catch(err=>console.error("Lỗi fetch Google Sheet:",err));
+if(!match){console.error("Không parse được dữ liệu từ Google Sheet");return;}
+try{rowsData=JSON.parse(match[1]).table.rows;drawData("all");}catch(err){console.error("Lỗi parse JSON:",err);}
+})
+.catch(err=>console.error("Lỗi fetch Google Sheet:",err));
 
-// Filter nút
-document.querySelectorAll("[data-crop]").forEach(btn=>{
-btn.addEventListener("click",()=>drawData(btn.getAttribute("data-crop")));
-});
+// nút filter
+document.querySelectorAll("[data-crop]").forEach(btn=>btn.addEventListener("click",function(){
+  drawData(this.getAttribute("data-crop"));
+}));
 
-// Menu mobile
+// mobile menu
 if(window.innerWidth<=768){
 document.querySelectorAll("#menu .menu>li>button").forEach(btn=>{
-btn.addEventListener("click",function(e){
-e.preventDefault();
-const li=this.parentElement;
-document.querySelectorAll("#menu .menu>li").forEach(item=>{if(item!==li)item.classList.remove("open");});
-li.classList.toggle("open");
-});
-});
+  btn.addEventListener("click",function(e){
+    e.preventDefault();
+    const li=this.parentElement;
+    document.querySelectorAll("#menu .menu>li").forEach(item=>{if(item!==li) item.classList.remove("open");});
+    li.classList.toggle("open");
+  });
 }
+);}
 };
 </script>
 </body>
 </html>
-
