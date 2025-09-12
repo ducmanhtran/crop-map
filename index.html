@@ -251,6 +251,7 @@ fetch(sheetTaskUrl)
 
 // handle date change
 function showTasks(){
+  console.log("selectedDate:", selectedDate.toDateString(), taskDateInput.value);
   const selectedDate = new Date(taskDateInput.value);
   if(!taskDateInput.value) return;
 
@@ -261,6 +262,9 @@ function showTasks(){
   const dayTasks = taskData.filter(row=>{
     const [stt,dateStr,lot,content,quantity]=row.c.map(c=>c?.v);
     const date = parseTaskDate(dateStr);
+        // ✍️ Thêm dòng này để kiểm tra:
+    console.log("sheet date:", dateStr, "→ parsed:", date,
+                "compare with selected:", selectedDate);
     return date && date.toDateString()===selectedDate.toDateString();
   });
 
@@ -300,5 +304,6 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
