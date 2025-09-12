@@ -87,12 +87,25 @@
 </div>
 
 <script>
-window.onload=function(){
-const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
-const sheetTaskUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json&gid=693737777";
+let rowsData=[], polygons=[], currentFilter="all", labelsVisible=false;
+let taskData=[], highlightLayers=[];
+const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+const polygonGroup=L.layerGroup().addTo(map);
 
-let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
-let taskData=[],highlightLayers=[];
+const toggleBtn=L.control({position:'bottomright'});
+toggleBtn.onAdd=function(){
+  const btn=L.DomUtil.create('button','toggle-labels-btn');
+  btn.innerHTML="👁️ Hiện nhãn";
+  btn.onclick=function(){
+    labelsVisible=!labelsVisible;
+    polygons.forEach(p=>{if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip);});
+    btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
+  };
+  return btn;
+};
+toggleBtn.addTo(map);
 
 function parseDate_fromSheet(str){
   if(!str) return null;
@@ -128,34 +141,12 @@ function parseTaskDate(str){
   return null;
 }
 
-// map
-const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
-L.control.zoom({position:'bottomright'}).addTo(map);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-const polygonGroup=L.layerGroup().addTo(map);
-
-// toggle nhãn
-const toggleBtn=L.control({position:'bottomright'});
-toggleBtn.onAdd=function(){
-  const btn=L.DomUtil.create('button','toggle-labels-btn');
-  btn.innerHTML="👁️ Hiện nhãn";
-  btn.onclick=function(){
-    labelsVisible=!labelsVisible;
-    polygons.forEach(p=>{if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip);});
-    btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
-  };
-  return btn;
-};
-toggleBtn.addTo(map);
-
-// drawData
 function drawData(filterCrop){
   currentFilter=filterCrop;
   polygonGroup.clearLayers();
   polygons=[];
   let totalGrassArea=0,totalCassavaArea=0,totalCornArea=0;
   const today=new Date();
-
   rowsData.forEach(row=>{
     const [name,areaRaw,crop,stage,dateStr,coordsStr]=row.c.map(c=>c?.v);
     const area=parseFloat(areaRaw)||0;
@@ -164,7 +155,6 @@ function drawData(filterCrop){
     const coords=JSON.parse(coordsStr);
 
     let color="blue",fillColor="gray",fillOpacity=0.6,weight=0.5;
-
     const plantDate=parseDate_fromSheet(dateStr);
     const monthsElapsed=plantDate?((today-plantDate)/(1000*60*60*24*30)):0;
 
@@ -192,7 +182,6 @@ function drawData(filterCrop){
     poly.bindPopup(`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${displayDate}`);
     poly.myTooltip=L.tooltip({permanent:true,direction:'center',className:'custom-label'}).setContent(`${name}<br>${area} ha`).setLatLng(poly.getBounds().getCenter());
     if(labelsVisible) map.addLayer(poly.myTooltip);
-
     polygons.push(poly);
   });
 
@@ -203,15 +192,79 @@ function drawData(filterCrop){
   else{box.style.display="none";}
 }
 
-// fetch crops sheet
-fetch(sheetCropsUrl)
-.then(res=>res.text())
-.then(data=>{
-  const match=data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-  if(!match){console.error("Không parse được dữ liệu từ Google Sheet");return;}
-  try{rowsData=JSON.parse(match[1]).table.rows;drawData("all");}catch(err){console.error("Lỗi parse JSON:",err);}
-})
-.catch(err=>console.error("Lỗi fetch Google Sheet:",err));
-
 // filter crop buttons
-document.querySelectorAll("[data-crop]").for
+document.querySelectorAll("[data-crop]").forEach(btn=>btn.addEventListener("click",function(){
+  drawData(this.getAttribute("data-crop"));
+}));
+
+// mobile menu
+if(window.innerWidth<=768){
+  document.querySelectorAll("#menu .menu>li>button").forEach(btn=>{
+    btn.addEventListener("click",function(e){
+      e.preventDefault();
+      const li=this.parentElement;
+      document.querySelectorAll("#menu .menu>li").forEach(item=>{if(item!==li) item.classList.remove("open");});
+      li.classList.toggle("open");
+    });
+  });
+}
+
+// task panel
+const taskPanel = document.getElementById("taskPanel");
+document.getElementById("dailyTaskBtn").onclick = ()=>{ taskPanel.style.display="block"; };
+
+const taskDateInput = document.getElementById("taskDate");
+const viewTasksBtn = document.getElementById("viewTasksBtn");
+const taskListDiv = document.getElementById("taskList");
+
+viewTasksBtn.onclick = function(){
+  const dateValue = taskDateInput.value;
+  if(!dateValue){ alert("Vui lòng chọn ngày!"); return; }
+  const selectedDate = new Date(dateValue);
+  highlightLayers.forEach(l => polygonGroup.removeLayer(l));
+  highlightLayers = [];
+
+  const dayTasks = taskData.filter(row=>{
+    const [stt,dateStr,lot,content,quantity] = row.c.map(c=>c?.v);
+    const date = parseTaskDate(dateStr);
+    return date && date.toDateString()===selectedDate.toDateString();
+  });
+
+  taskListDiv.innerHTML = "";
+  const lotTasksMap = {};
+  dayTasks.forEach(row=>{
+    const [stt,dateStr,lot,content,quantity] = row.c.map(c=>c?.v);
+    if(!lot) return;
+    if(!lotTasksMap[lot]) lotTasksMap[lot]=[];
+    lotTasksMap[lot].push({content,quantity});
+  });
+
+  for(const lot in lotTasksMap){
+    const poly = polygons.find(p => p.options.name===lot || p.myTooltip?.getContent()?.includes(lot));
+    if(poly){
+      const highlight = L.polygon(poly.getLatLngs(), {color:'red', weight:3, fill:false}).addTo(polygonGroup);
+      highlightLayers.push(highlight);
+    }
+    const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity})`).join("<br>");
+    taskListDiv.innerHTML += `<b>Lô ${lot}</b><br>${tasksHTML}<br><hr>`;
+  }
+};
+</script>
+
+<!-- Sheet Crops -->
+<script type="text/javascript" src="https://docs.google.com/spreadsheets/d/e/<ID_CROPS>/gviz/tq?sheet=Sheet1&tqx=out:json&callback=drawCrops"></script>
+<!-- Sheet Tasks -->
+<script type="text/javascript" src="https://docs.google.com/spreadsheets/d/e/<ID_TASKS>/gviz/tq?sheet=Tasks&tqx=out:json&callback=loadTasks"></script>
+
+<script>
+function drawCrops(data){
+  rowsData = data.table.rows;
+  drawData("all");
+}
+function loadTasks(data){
+  taskData = data.table.rows;
+}
+</script>
+
+</body>
+</html>
