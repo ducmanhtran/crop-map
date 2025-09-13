@@ -111,8 +111,7 @@
     width:90%;
   }
 }
-
-
+.lot-item:hover { cursor:pointer; background:#f9f9f9; }
 </style>
 </head>
 <body>
@@ -414,7 +413,37 @@ if (taskDateInput.value) {
     }
 
     const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity})`).join("<br>");
-    taskListDiv.innerHTML += `<b>Lô ${lot}</b><br>${tasksHTML}<br><hr>`;
+    taskListDiv.innerHTML += `
+    <div class="lot-item" data-lot="${lot}">
+      <b>Lô ${lot}</b><br>${tasksHTML}
+    </div><hr>`;
+// Gắn sự kiện hover cho từng dòng công việc
+document.querySelectorAll('#taskList .lot-item').forEach(item=>{
+  let blinkTimer;
+  item.addEventListener('mouseenter', ()=>{
+    const lotName = item.dataset.lot;
+    const poly = polygons.find(p=>p.options.name===lotName);
+    if(!poly) return;
+
+    let visible = true;
+    blinkTimer = setInterval(()=>{
+      poly.setStyle({opacity: visible?0.2:1, fillOpacity: visible?0.2:poly.options.fillOpacity});
+      visible = !visible;
+    }, 400); // tốc độ nhấp nháy 0.4s
+    item.dataset.blinkTimer = blinkTimer; // lưu để dừng khi rời
+  });
+
+  item.addEventListener('mouseleave', ()=>{
+    const lotName = item.dataset.lot;
+    const poly = polygons.find(p=>p.options.name===lotName);
+    if(poly){
+      // trả lại style gốc
+      poly.setStyle({opacity:1, fillOpacity:poly.options.fillOpacity});
+    }
+    clearInterval(item.dataset.blinkTimer);
+  });
+});
+
   }
 }
 
@@ -431,6 +460,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
