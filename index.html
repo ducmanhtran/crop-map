@@ -109,33 +109,25 @@
   }
 }
 /* Phần đầu panel */
- #taskPanel {
-  width: 300px;       /* hoặc 100% nếu full panel */
+#taskPanel {
+  position: relative;       /* làm mốc cho phần tử con */
 }
 
 #taskPanel .panel-header {
-  width: 100%;        /* bảo đảm chiếm đủ bề ngang */
-}
-
-#taskPanel .panel-header {
-  display: flex;
-  justify-content: space-between;  /* đẩy 2 phần tử ra 2 đầu */
-  align-items: center;             /* căn giữa theo chiều dọc */
-  padding: 0 10px;                 /* chừa lề 2 bên, tuỳ chỉnh */
-  box-sizing: border-box;          /* để padding tính trong chiều rộng */
-}
-
-#taskPanelTitle {
-  font-weight: bold;
+  position: relative;       /* để tiêu đề vẫn hiển thị bình thường */
+  padding-right: 35px;      /* chừa khoảng cho nút X */
 }
 
 #closeTasksBtn {
+  position: absolute;
+  top: 0;                   /* sát cạnh trên của .panel-header */
+  right: 0;                 /* sát mép phải panel */
   background: none;
   border: none;
-  font-size: 18px;    /* hoặc lớn hơn nếu muốn */
+  font-size: 18px;          /* tuỳ chỉnh */
   cursor: pointer;
+  line-height: 1;           /* tránh dính khoảng trống */
 }
-
 
 .lot-item:hover { cursor:pointer; background:#f9f9f9; }
 </style>
@@ -504,6 +496,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
