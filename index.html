@@ -108,18 +108,34 @@
     width:90%;
   }
 }
- #taskHeader {
-  display: flex;
-  justify-content: space-between; /* 2 phần tử ra 2 đầu */
-  align-items: center;            /* căn giữa theo chiều dọc */
+/* Phần đầu panel */
+ #taskPanel {
+  width: 300px;       /* hoặc 100% nếu full panel */
 }
 
-#closeTaskPanel {
+#taskPanel .panel-header {
+  width: 100%;        /* bảo đảm chiếm đủ bề ngang */
+}
+
+#taskPanel .panel-header {
+  display: flex;
+  justify-content: space-between;  /* đẩy 2 phần tử ra 2 đầu */
+  align-items: center;             /* căn giữa theo chiều dọc */
+  padding: 0 10px;                 /* chừa lề 2 bên, tuỳ chỉnh */
+  box-sizing: border-box;          /* để padding tính trong chiều rộng */
+}
+
+#taskPanelTitle {
+  font-weight: bold;
+}
+
+#closeTasksBtn {
   background: none;
   border: none;
-  font-size: 18px;   /* tuỳ chỉnh */
+  font-size: 18px;    /* hoặc lớn hơn nếu muốn */
   cursor: pointer;
 }
+
 
 .lot-item:hover { cursor:pointer; background:#f9f9f9; }
 </style>
@@ -488,6 +504,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
