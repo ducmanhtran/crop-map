@@ -329,11 +329,26 @@ const taskListDiv = document.getElementById("taskList");
 document.getElementById("dailyTaskBtn").addEventListener("click",function(){
   // 🔹 Khi mở panel, luôn đưa bản đồ về chế độ Tổng thể
   drawData("all");
-  // 🔹 Đồng thời cập nhật lại trạng thái nút “Hiện nhãn”
   document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
   labelsVisible = false;
+
+  // 🔹 Set ngày hiện tại cho input
+  const today = new Date();
+  const isoToday = today.toISOString().split('T')[0]; // yyyy-mm-dd
+  taskDateInput.value = isoToday;
+
+  // 🔹 Đổi tiêu đề
+  document.getElementById("taskPanelTitle").textContent =
+      "Công việc ngày " +
+      today.getDate().toString().padStart(2,'0') + "/" +
+      (today.getMonth()+1).toString().padStart(2,'0') + "/" +
+      today.getFullYear();
+
+  // 🔹 Hiển thị panel và load công việc của hôm nay
   taskPanel.style.display = "block";
+  showTasks();
 });
+
 
 taskDateInput.addEventListener("change", showTasks);
   // nút đóng
@@ -355,7 +370,15 @@ fetch(sheetTaskUrl)
 
 // handle date change
 function showTasks(){
-
+// cập nhật tiêu đề khi đổi ngày
+if (taskDateInput.value) {
+  const d = new Date(taskDateInput.value);
+  document.getElementById("taskPanelTitle").textContent =
+      "Công việc ngày " +
+      d.getDate().toString().padStart(2,'0') + "/" +
+      (d.getMonth()+1).toString().padStart(2,'0') + "/" +
+      d.getFullYear();
+}
   const selectedDate = new Date(taskDateInput.value);
   if(!taskDateInput.value) return;
   console.log("selectedDate:", selectedDate.toDateString(), taskDateInput.value);
@@ -407,6 +430,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
