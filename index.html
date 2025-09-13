@@ -250,14 +250,17 @@ function drawData(filterCrop){
       else if(crop==="Sắn") fillColor="green";
       else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
     }else{
-      if(crop==="Cỏ"||crop==="Sắn"){
-        fillColor=(crop==="Cỏ")?"yellow":"green";
-        if(monthsElapsed>=3){color="red";weight=2;}
-        if(monthsElapsed>=3) crop==="Cỏ"?totalGrassArea+=area:totalCassavaArea+=area;
+      if(crop==="Cỏ"){
+        fillColor="yellow";
+        if(monthsElapsed>=3){color="red";weight=2;totalGrassArea+=area}
+        fillOpacity=Math.min(1,monthsElapsed/6);
+      }else if(crop==="Sắn"){
+        fillColor="green";
+        if(monthsElapsed>=10){color="red";weight=2;totalCornArea+=area;}
         fillOpacity=Math.min(1,monthsElapsed/6);
       }else if(crop==="Ngô"){
         fillColor="orange";
-        if(monthsElapsed>=3){color="red";weight=2;totalCornArea+=area;}
+        if(monthsElapsed>=6){color="red";weight=2;totalCornArea+=area;}
         fillOpacity=Math.min(1,monthsElapsed/6);
       }else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
     }
@@ -505,6 +508,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
