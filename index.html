@@ -345,10 +345,23 @@ document.getElementById("dailyTaskBtn").addEventListener("click", function () {
   taskPanel.style.display = "block";
   showTasks();
 });
-taskDateInput.addEventListener("change", function(){
-  updateTaskPanelTitle(this.value);
-  showTasks();     // hàm lọc & hiển thị công việc như trước
+taskDateInput.addEventListener("change", function () {
+  const selectedDate = new Date(this.value);
+  selectedDate.setHours(0,0,0,0);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const dd = String(selectedDate.getDate()).padStart(2, "0");
+  const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
+  const yyyy = selectedDate.getFullYear();
+  const suffix = selectedDate > today ? " (dự kiến)" : "";
+
+  document.getElementById("taskPanelTitle").textContent =
+      "Công việc ngày " + dd + "/" + mm + "/" + yyyy + suffix;
+
+  showTasks();   // nếu cần lọc lại danh sách
 });
+
 
   // nút đóng
 document.getElementById("closeTasksBtn").addEventListener("click",function(){
@@ -497,6 +510,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
