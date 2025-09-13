@@ -229,6 +229,15 @@ toggleBtn.addTo(map);
 // drawData
 function drawData(filterCrop){
   currentFilter=filterCrop;
+  // 🔹 Luôn tắt nhãn khi đổi chế độ
+  labelsVisible = false;
+  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
+  polygons.forEach(p=>{
+    if (p.myTooltip) map.removeLayer(p.myTooltip);
+  });
+
+  polygonGroup.clearLayers();
+  polygons = [];
   polygonGroup.clearLayers();
   polygons=[];
   let totalGrassArea=0,totalCassavaArea=0,totalCornArea=0;
@@ -389,6 +398,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
