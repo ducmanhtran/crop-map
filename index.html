@@ -425,20 +425,39 @@ document.querySelectorAll('#taskList .lot-item').forEach(item=>{
     const poly = polygons.find(p=>p.options.name===lotName);
     if(!poly) return;
 
-    let visible = true;
+    // Lưu style gốc
+    const original = {
+      color: poly.options.color,
+      weight: poly.options.weight
+    };
+
+    let highlight = false;
     blinkTimer = setInterval(()=>{
-      poly.setStyle({opacity: visible?0.2:1, fillOpacity: visible?0.2:poly.options.fillOpacity});
-      visible = !visible;
+      if (highlight) {
+        // trở lại màu gốc
+        poly.setStyle(original);
+      } else {
+        // 🔹 đổi màu viền & tăng độ dày cho nổi bật
+        poly.setStyle({ color: 'red', weight: original.weight + 2 });
+      }
+      highlight = !highlight;
     }, 400); // tốc độ nhấp nháy 0.4s
-    item.dataset.blinkTimer = blinkTimer; // lưu để dừng khi rời
+
+    // lưu timer và style gốc để dùng khi rời chuột
+    item.dataset.blinkTimer = blinkTimer;
+    item.dataset.origColor = original.color;
+    item.dataset.origWeight = original.weight;
   });
 
   item.addEventListener('mouseleave', ()=>{
     const lotName = item.dataset.lot;
     const poly = polygons.find(p=>p.options.name===lotName);
     if(poly){
-      // trả lại style gốc
-      poly.setStyle({opacity:1, fillOpacity:poly.options.fillOpacity});
+      // Trả lại màu và độ dày gốc
+      poly.setStyle({
+        color: item.dataset.origColor,
+        weight: Number(item.dataset.origWeight)
+      });
     }
     clearInterval(item.dataset.blinkTimer);
   });
@@ -460,6 +479,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
