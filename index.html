@@ -312,55 +312,28 @@ const taskDateInput = document.getElementById("taskDate");
 const taskListDiv = document.getElementById("taskList");
 
 // click button daily task
-document.getElementById("dailyTaskBtn").addEventListener("click", function () {
-  // 🔹 Khi mở panel, luôn đưa bản đồ về chế độ Tổng thể
+document.getElementById("dailyTaskBtn").addEventListener("click", function(){
   drawData("all");
   document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
   labelsVisible = false;
 
-  // 🔹 Set ngày hiện tại cho input
   const today = new Date();
-  const isoToday = today.toISOString().split('T')[0]; // yyyy-mm-dd
+  const isoToday = today.toISOString().split('T')[0];
   taskDateInput.value = isoToday;
 
-  // 👉 Lấy ngày được gán cho input (mặc định hôm nay)
-  const selectedDate = new Date(taskDateInput.value);
-  selectedDate.setHours(0,0,0,0);
-  const now = new Date();
-  now.setHours(0,0,0,0);
+  updateTaskPanelTitle(new Date(isoToday)); // dùng hàm mới
 
-  // 👉 Chuẩn bị chuỗi dd/mm/yyyy
-  const dd = String(selectedDate.getDate()).padStart(2, "0");
-  const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
-  const yyyy = selectedDate.getFullYear();
-
-  // 👉 Nếu ngày chọn ở tương lai thì thêm "(dự kiến)"
-  const suffix = selectedDate > now ? " (dự kiến)" : "";
-
-  // 🔹 Đổi tiêu đề
-  document.getElementById("taskPanelTitle").textContent =
-    "Công việc ngày " + dd + "/" + mm + "/" + yyyy + suffix;
-
-  // 🔹 Hiển thị panel và load công việc của hôm nay
   taskPanel.style.display = "block";
   showTasks();
 });
+
 taskDateInput.addEventListener("change", function () {
-  const selectedDate = new Date(this.value);
-  selectedDate.setHours(0,0,0,0);
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  const dd = String(selectedDate.getDate()).padStart(2, "0");
-  const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
-  const yyyy = selectedDate.getFullYear();
-  const suffix = selectedDate > today ? " (dự kiến)" : "";
-
-  document.getElementById("taskPanelTitle").textContent =
-      "Công việc ngày " + dd + "/" + mm + "/" + yyyy + suffix;
-
-  showTasks();   // nếu cần lọc lại danh sách
+  if (this.value) {
+    updateTaskPanelTitle(new Date(this.value));
+  }
+  showTasks();
 });
+
 
 
   // nút đóng
@@ -379,26 +352,23 @@ fetch(sheetTaskUrl)
       taskData = JSON.parse(match[1]).table.rows;
     }
   });
-function updateTaskPanelTitle(dateStr) {
-  // dateStr là giá trị từ input type="date" hoặc từ ngày mặc định
-  const selectedDate = new Date(dateStr);
+function updateTaskPanelTitle(selectedDate) {
+  // 🔹 Đưa cả 2 về 0 giờ để so sánh chỉ theo ngày
   const today = new Date();
-  // bỏ phần giờ để so sánh chuẩn
   today.setHours(0,0,0,0);
   selectedDate.setHours(0,0,0,0);
 
-  // Tạo chuỗi dd/mm/yyyy
-  const dd = String(selectedDate.getDate()).padStart(2,"0");
-  const mm = String(selectedDate.getMonth()+1).padStart(2,"0");
-  const yyyy = selectedDate.getFullYear();
-  const dateText = `${dd}/${mm}/${yyyy}`;
+  let suffix = "";
+  if (selectedDate > today) suffix = " (dự kiến)";
 
-  // Nếu là ngày trong tương lai → thêm " (dự kiến)"
-  const future = selectedDate > today ? " (dự kiến)" : "";
+  const dd = String(selectedDate.getDate()).padStart(2,'0');
+  const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
+  const yyyy = selectedDate.getFullYear();
 
   document.getElementById("taskPanelTitle").textContent =
-      `Công việc ngày ${dateText}${future}`;
+      "Công việc ngày " + dd + "/" + mm + "/" + yyyy + suffix;
 }
+
 
 // handle date change
 function showTasks(){
@@ -510,6 +480,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
