@@ -312,20 +312,45 @@ const taskDateInput = document.getElementById("taskDate");
 const taskListDiv = document.getElementById("taskList");
 
 // click button daily task
-document.getElementById("dailyTaskBtn").addEventListener("click", function(){
+document.getElementById("dailyTaskBtn").addEventListener("click", function () {
   drawData("all");
-  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
+  document.querySelector(".toggle-labels-btn").innerHTML = "👁️ Hiện nhãn";
   labelsVisible = false;
 
-  const today = new Date();
-  const isoToday = today.toISOString().split('T')[0];
-  taskDateInput.value = isoToday;
+  // 🔹 Lấy ngày địa phương, KHÔNG dùng toISOString()
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
 
-  updateTaskPanelTitle(new Date(isoToday)); // dùng hàm mới
+  // Set input = hôm nay (giờ địa phương)
+  taskDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+  // Hàm cập nhật tiêu đề (gọi cả khi mở panel & khi đổi ngày)
+  function updateTitle() {
+    const selected = new Date(taskDateInput.value); // ngày chọn
+    const today = new Date();                       // bây giờ
+
+    // Đưa cả hai về nửa đêm để so sánh ngày, không so sánh giờ
+    today.setHours(0,0,0,0);
+    selected.setHours(0,0,0,0);
+
+    const d = String(selected.getDate()).padStart(2,"0");
+    const m = String(selected.getMonth() + 1).padStart(2,"0");
+    const y = selected.getFullYear();
+
+    const isFuture = selected.getTime() > today.getTime();
+    document.getElementById("taskPanelTitle").textContent =
+        "Công việc ngày " + d + "/" + m + "/" + y + (isFuture ? " (dự kiến)" : "");
+  }
+
+  updateTitle();            // khi mở panel
+  taskDateInput.onchange = updateTitle; // khi người dùng đổi ngày
 
   taskPanel.style.display = "block";
   showTasks();
 });
+
 
 taskDateInput.addEventListener("change", function () {
   if (this.value) {
@@ -480,6 +505,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
