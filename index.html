@@ -427,36 +427,35 @@ document.querySelectorAll('#taskList .lot-item').forEach(item=>{
 
     // Lưu style gốc
     const original = {
-      color: poly.options.color,
-      weight: poly.options.weight
+      fillColor: poly.options.fillColor || 'red', // nếu chưa có sẽ dùng đỏ
+      fillOpacity: poly.options.fillOpacity || 0
     };
 
-    let highlight = false;
+    let visible = false;
     blinkTimer = setInterval(()=>{
-      if (highlight) {
-        // trở lại màu gốc
-        poly.setStyle(original);
+      if (visible) {
+        // trở lại trong suốt
+        poly.setStyle({ fillOpacity: 0 });
       } else {
-        // 🔹 đổi màu viền & tăng độ dày cho nổi bật
-        poly.setStyle({ color: 'red', weight: original.weight + 2 });
+        // 🔴 tô nền đỏ mờ
+        poly.setStyle({ fillColor: 'red', fillOpacity: 0.4 });
       }
-      highlight = !highlight;
+      visible = !visible;
     }, 400); // tốc độ nhấp nháy 0.4s
 
-    // lưu timer và style gốc để dùng khi rời chuột
     item.dataset.blinkTimer = blinkTimer;
-    item.dataset.origColor = original.color;
-    item.dataset.origWeight = original.weight;
+    item.dataset.origFillColor = original.fillColor;
+    item.dataset.origFillOpacity = original.fillOpacity;
   });
 
   item.addEventListener('mouseleave', ()=>{
     const lotName = item.dataset.lot;
     const poly = polygons.find(p=>p.options.name===lotName);
     if(poly){
-      // Trả lại màu và độ dày gốc
+      // Trả lại nền gốc
       poly.setStyle({
-        color: item.dataset.origColor,
-        weight: Number(item.dataset.origWeight)
+        fillColor: item.dataset.origFillColor,
+        fillOpacity: Number(item.dataset.origFillOpacity)
       });
     }
     clearInterval(item.dataset.blinkTimer);
@@ -479,6 +478,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
