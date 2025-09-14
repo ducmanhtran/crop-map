@@ -73,13 +73,15 @@
 
 @media (max-width:768px){
   #taskPanel{
+    position: fixed;       /* chắc chắn panel được định vị tuyệt đối trên màn hình */
     top:10px;
-    bottom:auto; 
-    right:5px;
-    left:auto;
-    width:90%;
+    bottom:auto;
+    left:50%;              /* đặt tâm của panel ở giữa màn hình */
+    transform: translateX(-50%); /* dịch trái 1/2 chiều rộng để thật sự nằm giữa */
+    width:80%;
   }
 }
+
 
 #taskPanel .panel-header {
   position: relative;       /* để tiêu đề vẫn hiển thị bình thường */
@@ -508,6 +510,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
