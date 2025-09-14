@@ -126,7 +126,7 @@
 </ul></li>
 <li><button>📜 Pháp lý ▾</button>
 <ul class="submenu">
-<li><button>📖 Sổ đỏ</button></li>
+<li><button id="legalBtn">📖 Sổ đỏ</button></li>
 </ul></li>
 </ul>
 </nav>
@@ -155,7 +155,7 @@
 window.onload=function(){
 const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
 const sheetTaskUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json&gid=693737777";
-
+const sheetLegalUrl = "https://docs.google.com/spreadsheets/d/1yLzyQRiZjOxwXDNL2gKtzTULA9ODTcS0bLXTOxqELBE/gviz/tq?tqx=out:json";
 let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
 let taskData=[],highlightLayers=[];
 
@@ -330,6 +330,53 @@ document.getElementById("dailyTaskBtn").addEventListener("click", function () {
 
   // Set input = hôm nay (giờ địa phương)
   taskDateInput.value = `${yyyy}-${mm}-${dd}`;
+function drawLegalLots(){
+  // xóa hết layer cũ
+  polygonGroup.clearLayers();
+  polygons = [];
+  labelsVisible = false;
+  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
+
+  fetch(sheetLegalUrl)
+    .then(res=>res.text())
+    .then(txt=>{
+      const match = txt.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+      if(!match) { console.error("Không đọc được sheet sổ đỏ"); return; }
+      const rows = JSON.parse(match[1]).table.rows;
+
+      rows.forEach(r=>{
+        const [stt,name,areaRaw,coordsStr,note] = r.c.map(c=>c?.v);
+        if(!coordsStr) return;
+        const coords = JSON.parse(coordsStr);
+        const area = parseFloat(areaRaw)||0;
+
+        const poly = L.polygon(coords,{
+          color: "blue",
+          weight: 1,
+          fillColor: "#add8e6",
+          fillOpacity: 0.4
+        }).addTo(polygonGroup);
+
+        poly.options.name = name;
+
+        poly.bindPopup(
+          `<b>${name}</b><br>Diện tích: ${area} ha<br>${note?note:""}`
+        );
+
+        // Tooltip cố định giữa polygon
+        poly.myTooltip = L.tooltip({
+          permanent:true,
+          direction:"center",
+          className:"custom-label"
+        })
+        .setContent(`${name}<br>${area} ha`)
+        .setLatLng(poly.getBounds().getCenter());
+
+        polygons.push(poly);
+      });
+    })
+    .catch(err=>console.error("Lỗi fetch sổ đỏ:",err));
+}
 
   // Hàm cập nhật tiêu đề (gọi cả khi mở panel & khi đổi ngày)
   function updateTitle() {
@@ -364,8 +411,6 @@ taskDateInput.addEventListener("change", function () {
   showTasks();
 });
 
-
-
   // nút đóng
 document.getElementById("closeTasksBtn").addEventListener("click",function(){
   taskPanel.style.display="none";
@@ -373,6 +418,10 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
   highlightLayers=[];
   taskListDiv.innerHTML="";
 });
+  document.getElementById("legalBtn").addEventListener("click", function(){
+  drawLegalLots();
+});
+
 // fetch task sheet
 fetch(sheetTaskUrl)
   .then(res => res.text())
@@ -398,8 +447,6 @@ function updateTaskPanelTitle(selectedDate) {
   document.getElementById("taskPanelTitle").textContent =
       "Công việc ngày " + dd + "/" + mm + "/" + yyyy + suffix;
 }
-
-
 // handle date change
 function showTasks(){
 // cập nhật tiêu đề khi đổi ngày
@@ -510,6 +557,7 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
+
 
 
 
