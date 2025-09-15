@@ -438,6 +438,7 @@ document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
 
 };
 function resetLegalView(){
+  console.log('RESET LEGAL VIEW CALLED');
   ['chkCompanyLegal','chkActualLots','chkDisputed'].forEach(id=>{
      const el = document.getElementById(id);
      el.checked = false;
@@ -448,6 +449,7 @@ function resetLegalView(){
 </script>
 </body>
 </html>
+
 
 
 
