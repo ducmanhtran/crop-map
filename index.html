@@ -13,9 +13,10 @@
 #menu .menu>li{position:relative;}
 #menu button{background:none;border:none;padding:14px 20px;font-size:15px;color:#fff;font-weight:600;cursor:pointer;transition:background 0.3s;display:flex;align-items:center;gap:6px;}
 #menu button:hover{background:rgba(0,0,0,0.05);color:#007bff;}
-#menu .submenu{display:none;position:absolute;top:100%;left:0;background:#fff;list-style:none;margin:0;padding:6px 0;box-shadow:0 2px 6px rgba(0,0,0,0.25);min-width:220px;border-radius:4px;}
-#menu .submenu li{text-align:left;padding:4px 12px;}
-#menu .submenu label{font-size:14px;color:#333;display:block;cursor:pointer;}
+#menu .submenu{display:none;position:absolute;top:100%;left:0;background:#fff;list-style:none;margin:0;padding:6px 0;box-shadow:0 2px 6px rgba(0,0,0,0.25);min-width:200px;border-radius:4px;}
+#menu .submenu li{text-align:left;}
+#menu .submenu button{width:100%;text-align:left;padding:10px 14px;font-size:14px;color:#333;background:none;border:none;}
+#menu .submenu button:hover{background:#f0f0f0;color:#007bff;}
 #menu .menu>li:hover>.submenu{display:block;}
 @media(max-width:768px){
   #infoBox{bottom:80px;left:5px;font-size:13px;padding:6px 10px;}
@@ -35,27 +36,70 @@
 .custom-label{font-weight:200;font-size:13px;color:#000;text-align:center;white-space:nowrap;}
 .toggle-labels-btn{background:#fff;border:1px solid #bbb;border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.15);margin-bottom:40px;}
 .toggle-labels-btn:hover{background:#f0f0f0;}
-#infoBox{position:fixed;bottom:40px;left:10px;background:rgba(255,255,255,0.9);border:1px solid #ccc;padding:8px 12px;font-size:14px;font-weight:bold;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none}
+#infoBox{position:fixed;bottom:40px;left:10px;background:rgba(255,255,255,0.9);border:1px solid #ccc;padding:8px 12px;font-size:14px;font-weight:bold;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;}
 /* ===== TASK PANEL ===== */
-#taskPanel{position:fixed;top:60px;right:10px;width:320px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
+#taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
 #taskPanel label{font-weight:bold;}
 #taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;}
-#closeTasksBtn {position: absolute;top: 0;right: 0;background: none;border: none;font-size: 18px;cursor: pointer;line-height: 1;}
-#closeTasksBtn{background:none;border:none;color:#000;font-size:18px;cursor:pointer;}
-#taskPanel .task-content{max-height:250px;overflow:auto;padding:10px 14px;font-size:14px;line-height:1.4;}
-#taskPanel .date-label{display:block;margin:8px 14px 4px;font-weight:bold;}
-#taskDate{width:calc(100% - 28px);margin:0 14px 12px;padding:6px 8px;border:1px solid #ccc;border-radius:6px;}
+#closeTasksBtn{
+  background:none;
+  border:none;
+  color:#000;
+  font-size:18px;
+  cursor:pointer;
+}
+
+#taskPanel .task-content{
+  max-height:250px;
+  overflow:auto;
+  padding:10px 14px;
+  font-size:14px;
+  line-height:1.4;
+}
+
+#taskPanel .date-label{
+  display:block;
+  margin:8px 14px 4px;
+  font-weight:bold;
+}
+
+#taskDate{
+  width:calc(100% - 28px);
+  margin:0 14px 12px;
+  padding:6px 8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
 @media (max-width:768px){
-  #taskPanel{position: fixed;top:10px;bottom:auto;left:50%;transform: translateX(-50%);width:80%;}
+  #taskPanel{
+    position: fixed;       /* chắc chắn panel được định vị tuyệt đối trên màn hình */
+    top:10px;
+    bottom:auto;
+    left:50%;              /* đặt tâm của panel ở giữa màn hình */
+    transform: translateX(-50%); /* dịch trái 1/2 chiều rộng để thật sự nằm giữa */
+    width:80%;
+  }
 }
+
+
+#taskPanel .panel-header {
+  position: relative;       /* để tiêu đề vẫn hiển thị bình thường */
+  padding-right: 35px;      /* chừa khoảng cho nút X */
+}
+
+#closeTasksBtn {
+  position: absolute;
+  top: 0;                   /* sát cạnh trên của .panel-header */
+  right: 0;                 /* sát mép phải panel */
+  background: none;
+  border: none;
+  font-size: 18px;          /* tuỳ chỉnh */
+  cursor: pointer;
+  line-height: 1;           /* tránh dính khoảng trống */
+}
+
 .lot-item:hover { cursor:pointer; background:#f9f9f9; }
-#menu .submenu li,
-#menu .submenu li label,
-#menu .submenu div,
-#menu .submenu div label {
-  color: #000 !important;
-  background: #fff !important;
-}
 </style>
 </head>
 <body>
@@ -351,6 +395,7 @@ if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').f
 </script>
 </body>
 </html>
+
 
 
 
