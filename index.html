@@ -49,9 +49,13 @@
   #taskPanel{position: fixed;top:10px;bottom:auto;left:50%;transform: translateX(-50%);width:80%;}
 }
 .lot-item:hover { cursor:pointer; background:#f9f9f9; }
-ul.submenu li {color: #000;background: #fff;}
-ul.submenu li label {color: #000;}
-
+#menu .submenu li,
+#menu .submenu li label,
+#menu .submenu div,
+#menu .submenu div label {
+  color: #000 !important;
+  background: #fff !important;
+}
 </style>
 </head>
 <body>
@@ -343,5 +347,6 @@ if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').f
 </script>
 </body>
 </html>
+
 
 
