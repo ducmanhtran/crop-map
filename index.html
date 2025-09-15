@@ -417,22 +417,32 @@ document.getElementById('closeTasksBtn').addEventListener('click', function(){ t
 document.querySelectorAll('[data-crop]').forEach(btn=>btn.addEventListener('click',function(){ drawCrops(this.dataset.crop); }));
 
 // ----- mobile menu open/close
-if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').forEach(btn=>{ btn.addEventListener('click',function(e){ e.preventDefault(); const li=this.parentElement; document.querySelectorAll('#menu .menu>li').forEach(item=>{ if(item!==li) item.classList.remove('open'); }); li.classList.toggle('open'); }); }); }
+document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
+  btn.addEventListener('click', function(e){
+    // xử lý mobile menu open/close
+    if(window.innerWidth<=768){
+      const li = this.parentElement;
+      document.querySelectorAll('#menu .menu>li').forEach(item=>{
+         if(item!==li) item.classList.remove('open');
+      });
+      li.classList.toggle('open');
+    }
+
+    // nếu KHÔNG phải menu Pháp lý => reset
+    if(!this.textContent.includes('Pháp lý')){
+       resetLegalView();
+    }
+  });
+});
+
 
 };
-  function resetLegalView(){
-  // Bỏ check 3 checkbox
-  document.getElementById('chkCompanyLegal').checked = false;
-  document.getElementById('chkActualLots').checked   = false;
-  document.getElementById('chkDisputed').checked     = false;
-
-  // Xóa layer pháp lý
-  companyLegalGroup.clearLayers();
-  actualLotsGroup.clearLayers();
-  disputedGroup.clearLayers();
-
-  // Bật lại lớp cây trồng
-  if(!map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
+function resetLegalView(){
+  ['chkCompanyLegal','chkActualLots','chkDisputed'].forEach(id=>{
+     const el = document.getElementById(id);
+     el.checked = false;
+     el.dispatchEvent(new Event('change')); // <-- quan trọng
+  });
 }
 document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
   btn.addEventListener('click', function(){
@@ -446,6 +456,7 @@ document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
 </script>
 </body>
 </html>
+
 
 
 
