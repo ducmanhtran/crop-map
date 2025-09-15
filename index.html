@@ -227,6 +227,7 @@ function parseTaskDate(dateStr){ if(!dateStr) return null; const m = dateStr.mat
 // ----- draw crops (cập nhật index theo tên)
 function drawCrops(filterCrop){
   cropsGroup.clearLayers(); polygons = []; Object.keys(cropsByName).forEach(k=>delete cropsByName[k]);
+  labelsVisible = false;
   const today = new Date();
   let totalGrassArea=0,totalCassavaArea=0,totalCornArea=0;
   rowsData.forEach(row=>{
@@ -416,6 +417,7 @@ if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').f
 </script>
 </body>
 </html>
+
 
 
 
