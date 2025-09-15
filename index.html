@@ -226,12 +226,6 @@ function parseTaskDate(dateStr){ if(!dateStr) return null; const m = dateStr.mat
 
 // ----- draw crops (cập nhật index theo tên)
 function drawCrops(filterCrop){
-    // 🔹 Luôn tắt nhãn khi đổi chế độ
-  labelsVisible = false;
-  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
-  polygons.forEach(p=>{
-    if (p.myTooltip) map.removeLayer(p.myTooltip);
-  });
   cropsGroup.clearLayers(); polygons = []; Object.keys(cropsByName).forEach(k=>delete cropsByName[k]);
 
   const today = new Date();
