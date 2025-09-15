@@ -90,9 +90,7 @@
 
 <div id="map"></div>
 <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
-
-<div id="infoBox"></div>
-
+<div id="infoBox" style="display:none"></div>
 <div id="taskPanel">
 <div class="panel-header">
   <span id="taskPanelTitle">Công việc hàng ngày</span>
@@ -165,6 +163,7 @@ function parseTaskDate(dateStr){ if(!dateStr) return null; const m = dateStr.mat
 function drawCrops(filterCrop){
   cropsGroup.clearLayers(); polygons = []; Object.keys(cropsByName).forEach(k=>delete cropsByName[k]);
   const today = new Date();
+  let totalGrassArea=0,totalCassavaArea=0,totalCornArea=0;
   rowsData.forEach(row=>{
     const [name,areaRaw,crop,stage,dateStr,coordsStr] = row.c.map(c=>c?.v);
     const area = parseFloat(areaRaw)||0;
@@ -175,9 +174,9 @@ function drawCrops(filterCrop){
     if(filterCrop==='all'){
       if(crop==='Cỏ') fillColor='yellow'; else if(crop==='Ngô') fillColor='orange'; else if(crop==='Sắn') fillColor='green'; else if(crop==='Đất trống'){ fillColor='brown'; fillOpacity=0.3; }
     } else {
-      if(crop==='Cỏ'){ fillColor='yellow'; if(monthsElapsed>=3){ color='red'; weight=2; } fillOpacity=Math.min(1, monthsElapsed/6); }
-      else if(crop==='Sắn'){ fillColor='green'; if(monthsElapsed>=10){ color='red'; weight=2; } fillOpacity=Math.min(1, monthsElapsed/6*3/10); }
-      else if(crop==='Ngô'){ fillColor='orange'; if(monthsElapsed>=6){ color='red'; weight=2; } fillOpacity=Math.min(1, monthsElapsed/6*3/6); }
+      if(crop==='Cỏ'){ fillColor='yellow'; if(monthsElapsed>=3){ color='red'; weight=2;totalGrassArea+=area } fillOpacity=Math.min(1, monthsElapsed/6); }
+      else if(crop==='Sắn'){ fillColor='green'; if(monthsElapsed>=10){ color='red'; weight=2;totalCassavaArea+=area;} fillOpacity=Math.min(1, monthsElapsed/6*3/10); }
+      else if(crop==='Ngô'){ fillColor='orange'; if(monthsElapsed>=6){ color='red'; weight=2;totalCornArea+=area; } fillOpacity=Math.min(1, monthsElapsed/6*3/6); }
       else if(crop==='Đất trống'){ fillColor='brown'; fillOpacity=0.3; }
     }
     const poly = L.polygon(coords,{color,weight,fillColor,fillOpacity}).addTo(cropsGroup);
@@ -189,6 +188,11 @@ function drawCrops(filterCrop){
     polygons.push(poly);
     if(name) cropsByName[String(name)] = poly;
   });
+  const box=document.getElementById("infoBox");
+  if(filterCrop==="Cỏ") {box.style.display="block";box.innerText=`🌱 Cỏ đến hạn thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
+  else if(filterCrop==="Sắn"){box.style.display="block";box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
+  else if(filterCrop==="Ngô"){box.style.display="block";box.innerText=`🌽 Ngô đến hạn thu hoạch: ${totalCornArea.toFixed(2)} ha`;}
+  else{box.style.display="none";}
 }
 
 // ----- fetch crops
@@ -347,6 +351,7 @@ if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').f
 </script>
 </body>
 </html>
+
 
 
 
