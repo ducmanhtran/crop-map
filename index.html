@@ -417,12 +417,12 @@ document.getElementById('closeTasksBtn').addEventListener('click', function(){ t
 document.querySelectorAll('[data-crop]').forEach(btn=>btn.addEventListener('click',function(){ drawCrops(this.dataset.crop); }));
 
 // ----- mobile menu open/close
-document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
+document.querySelectorAll('#menu button').forEach(btn=>{
   btn.addEventListener('click', function(e){
     // xử lý mobile menu open/close
     if(window.innerWidth<=768){
       const li = this.parentElement;
-      document.querySelectorAll('#menu .menu>li').forEach(item=>{
+      document.querySelectorAll('#menu button').forEach(item=>{
          if(item!==li) item.classList.remove('open');
       });
       li.classList.toggle('open');
@@ -449,6 +449,7 @@ function resetLegalView(){
 </script>
 </body>
 </html>
+
 
 
 
