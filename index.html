@@ -420,13 +420,13 @@ document.querySelectorAll('[data-crop]').forEach(btn=>btn.addEventListener('clic
 document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
   btn.addEventListener('click', function(e){
     // xử lý mobile menu open/close
-    if(window.innerWidth<=768){
-      const li = this.parentElement;
-      document.querySelectorAll('#menu .menu>li').forEach(item=>{
-         if(item!==li) item.classList.remove('open');
-      });
-      li.classList.toggle('open');
-    }
+   // if(window.innerWidth<=768){
+    //  const li = this.parentElement;
+    //  document.querySelectorAll('#menu .menu>li').forEach(item=>{
+     //    if(item!==li) item.classList.remove('open');
+    //  });
+     // li.classList.toggle('open');
+    //}
 
     // nếu KHÔNG phải menu Pháp lý => reset
     if(!this.textContent.includes('Pháp lý')){
@@ -447,8 +447,22 @@ function resetLegalView(){
 }
 
 </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
+    btn.addEventListener('click', function(e){
+      console.log('>>> RESET LEGAL VIEW CALLED');
+      if(!this.textContent.includes('Pháp lý')){
+         resetLegalView();
+      }
+    });
+  });
+});
+</script>
+
 </body>
 </html>
+
 
 
 
