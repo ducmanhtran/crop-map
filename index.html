@@ -420,9 +420,33 @@ document.querySelectorAll('[data-crop]').forEach(btn=>btn.addEventListener('clic
 if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').forEach(btn=>{ btn.addEventListener('click',function(e){ e.preventDefault(); const li=this.parentElement; document.querySelectorAll('#menu .menu>li').forEach(item=>{ if(item!==li) item.classList.remove('open'); }); li.classList.toggle('open'); }); }); }
 
 };
+  function resetLegalView(){
+  // Bỏ check 3 checkbox
+  document.getElementById('chkCompanyLegal').checked = false;
+  document.getElementById('chkActualLots').checked   = false;
+  document.getElementById('chkDisputed').checked     = false;
+
+  // Xóa layer pháp lý
+  companyLegalGroup.clearLayers();
+  actualLotsGroup.clearLayers();
+  disputedGroup.clearLayers();
+
+  // Bật lại lớp cây trồng
+  if(!map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
+}
+document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
+  btn.addEventListener('click', function(){
+     // Nếu nút này KHÔNG phải menu Pháp lý
+     if(!this.textContent.includes('Pháp lý')){
+         resetLegalView();
+     }
+  });
+});
+
 </script>
 </body>
 </html>
+
 
 
 
