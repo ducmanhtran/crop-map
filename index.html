@@ -444,18 +444,11 @@ function resetLegalView(){
      el.dispatchEvent(new Event('change')); // <-- quan trọng
   });
 }
-document.querySelectorAll('#menu .menu > li > button').forEach(btn=>{
-  btn.addEventListener('click', function(){
-     // Nếu nút này KHÔNG phải menu Pháp lý
-     if(!this.textContent.includes('Pháp lý')){
-         resetLegalView();
-     }
-  });
-});
 
 </script>
 </body>
 </html>
+
 
 
 
