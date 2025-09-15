@@ -232,9 +232,6 @@ function drawCrops(filterCrop){
   polygons.forEach(p=>{
     if (p.myTooltip) map.removeLayer(p.myTooltip);
   });
-
-  polygonGroup.clearLayers();
-  polygons = [];
   cropsGroup.clearLayers(); polygons = []; Object.keys(cropsByName).forEach(k=>delete cropsByName[k]);
 
   const today = new Date();
@@ -426,6 +423,7 @@ if(window.innerWidth<=768){ document.querySelectorAll('#menu .menu>li>button').f
 </script>
 </body>
 </html>
+
 
 
 
