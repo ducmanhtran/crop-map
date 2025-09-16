@@ -133,6 +133,26 @@
   <label for="taskDate" class="date-label">Chọn ngày:</label>
   <input type="date" id="taskDate">
 </div>
+<script>
+const hamburger = document.getElementById('hamburger');
+const mainMenu  = document.getElementById('mainMenu');
+
+hamburger.addEventListener('click', () => {
+  mainMenu.classList.toggle('show');
+  hamburger.setAttribute(
+    'aria-expanded',
+    hamburger.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
+  );
+});
+
+document.querySelectorAll('.toggle-sub').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const submenu = btn.nextElementSibling;
+    submenu.classList.toggle('show');
+    btn.querySelector('.arrow').classList.toggle('open');
+  });
+});
+</script>
 
 <script>
 window.onload = function () {
@@ -429,6 +449,7 @@ window.onload = function () {
 </script>
 </body>
 </html>
+
 
 
 
