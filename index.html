@@ -462,9 +462,6 @@ window.onload = function () {
   this.setAttribute('aria-expanded', !is);
 });
 // ----- Đóng menu khi click vào bất kỳ item nào (mobile) -----
-const hamburgerBtn = document.getElementById('hamburger');
-const menuEl = document.querySelector('#menu .menu');
-
 // Đóng menu chính khi click vào mục cuối cùng
 document.querySelectorAll('#menu .final-item').forEach(link => {
   link.addEventListener('click', function () {
@@ -480,6 +477,7 @@ document.querySelectorAll('#menu .final-item').forEach(link => {
 </script>
 </body>
 </html>
+
 
 
 
