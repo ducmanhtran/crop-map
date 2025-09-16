@@ -50,6 +50,9 @@
     background:rgba(255,255,255,0.95);
     box-shadow:0 2px 6px rgba(0,0,0,0.12);
   }
+    #menu .menu.show{
+    display: grid; /* hoặc block */
+  }
 }
 /* ===== MAP + FOOTER ===== */
 #map{height:calc(100vh - 100px);width:100%;margin:0;padding:0}
@@ -133,26 +136,6 @@
   <label for="taskDate" class="date-label">Chọn ngày:</label>
   <input type="date" id="taskDate">
 </div>
-<script>
-const hamburger = document.getElementById('hamburger');
-const mainMenu  = document.getElementById('mainMenu');
-
-hamburger.addEventListener('click', () => {
-  mainMenu.classList.toggle('show');
-  hamburger.setAttribute(
-    'aria-expanded',
-    hamburger.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
-  );
-});
-
-document.querySelectorAll('.toggle-sub').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const submenu = btn.nextElementSibling;
-    submenu.classList.toggle('show');
-    btn.querySelector('.arrow').classList.toggle('open');
-  });
-});
-</script>
 
 <script>
 window.onload = function () {
@@ -439,16 +422,17 @@ window.onload = function () {
   }
   // ----- mobile menu open/close (sửa logic để chỉ tác động top-level trên mobile)
   const hamburgerBtn = document.getElementById('hamburger');
-  hamburgerBtn.addEventListener('click', function(e){
-    const menuEl = document.getElementById('menu');
-    menuEl.classList.toggle('menu-open');
-    const is = this.getAttribute('aria-expanded') === 'true';
-    this.setAttribute('aria-expanded', !is);
-  });
+  hamburgerBtn.addEventListener('click', function(){
+  const menuEl = document.querySelector('#menu .menu'); // lấy đúng ul.menu
+  menuEl.classList.toggle('show');
+  const is = this.getAttribute('aria-expanded') === 'true';
+  this.setAttribute('aria-expanded', !is);
+});
 };
 </script>
 </body>
 </html>
+
 
 
 
