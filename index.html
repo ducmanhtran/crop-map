@@ -491,6 +491,21 @@ document.querySelectorAll('#menu .menu > li > button').forEach(btn => {
     }
   });
 });
+  // Đóng menu và reset bản đồ khi click nút con (mobile + desktop)
+document.querySelectorAll('#menu .final-item').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const menuEl = document.querySelector('#menu .menu');
+    if (window.innerWidth <= 768) menuEl.classList.remove('show'); // ẩn menu trên mobile
+    hamburger.setAttribute('aria-expanded', 'false');
+
+    const text = this.textContent.trim();
+    // Nếu là nút con bên trong menu công việc hoặc nút KHÔNG phải cây trồng
+    if (!text.includes('Cây trồng')) {
+      resetLegalView();    // bỏ chọn các checkbox pháp lý
+      drawCrops('all');    // hiển thị tổng thể tất cả cây trồng
+    }
+  });
+});
 function updateTaskPanelTitle(selectedDate) {
   if (!selectedDate) return;
   
@@ -509,3 +524,4 @@ function updateTaskPanelTitle(selectedDate) {
 </script>
 </body>
 </html>
+
