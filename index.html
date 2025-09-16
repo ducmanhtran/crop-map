@@ -472,65 +472,40 @@ document.querySelectorAll('#menu .final-item').forEach(link => {
     }
   });
 });
-};
-  // --- phần menu top-level ---
-  document.querySelectorAll('#menu .menu > li > button').forEach(btn => {
-    btn.addEventListener('click', function (e) {
-      const li = this.parentElement;
-      if (window.innerWidth <= 768) {
-        document.querySelectorAll('#menu .menu>li').forEach(item => { if (item !== li) item.classList.remove('open'); });
-        li.classList.toggle('open');
-      }
-      const text = this.textContent.trim();
-      if (!text.includes('Cây trồng')) {
-        resetLegalView();
-        drawCrops('all');
-      }
-    });
+document.querySelectorAll('#menu .menu > li > button').forEach(btn => {
+  btn.addEventListener('click', function (e) {
+    const li = this.parentElement;
+
+    // Mobile: toggle submenu
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll('#menu .menu>li').forEach(item => { if (item !== li) item.classList.remove('open'); });
+      li.classList.toggle('open');
+    }
+
+    const text = this.textContent.trim();
+
+    // Nếu KHÔNG phải menu "Cây trồng"
+    if (!text.includes('Cây trồng')) {
+      resetLegalView();         // bỏ chọn các checkbox pháp lý
+      drawCrops('all');         // hiển thị tổng thể tất cả cây trồng
+    }
   });
+});
+function updateTaskPanelTitle(selectedDate) {
+  if (!selectedDate) return;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);       // reset giờ, phút, giây
+  selectedDate.setHours(0, 0, 0, 0); 
 
-  // --- update task panel title nếu ngày tương lai ---
-  function updateTaskPanelTitle(selectedDate) {
-    if (!selectedDate) return;
-    const today = new Date(); today.setHours(0,0,0,0);
-    selectedDate.setHours(0,0,0,0);
-    const suffix = selectedDate > today ? ' (dự kiến)' : '';
-    const dd = String(selectedDate.getDate()).padStart(2,'0');
-    const mm = String(selectedDate.getMonth() + 1).padStart(2,'0');
-    const yyyy = selectedDate.getFullYear();
-    document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
-  }
+  const suffix = selectedDate > today ? ' (dự kiến)' : '';  // nếu ngày trong tương lai, thêm chữ dự kiến
+  const dd = String(selectedDate.getDate()).padStart(2,'0');
+  const mm = String(selectedDate.getMonth() + 1).padStart(2,'0');
+  const yyyy = selectedDate.getFullYear();
 
-  // --- hamburger mobile ---
-  const hamburgerBtn = document.getElementById('hamburger');
-  hamburgerBtn.addEventListener('click', () => {
-    const menu = document.querySelector('#menu .menu');
-    menu.classList.toggle('show');
-    const expanded = menu.classList.contains('show');
-    hamburgerBtn.setAttribute('aria-expanded', expanded);
-  });
-
-  // --- close task panel ---
-  document.getElementById('closeTasksBtn').onclick = () => {
-    document.getElementById('taskPanel').style.display = 'none';
-  };
+  document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
+}
 };
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
