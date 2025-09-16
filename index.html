@@ -40,13 +40,44 @@
 /* ===== TASK PANEL ===== */
 #taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
 #taskPanel label{font-weight:bold;}
-#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;}
+#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;
+/* ===== TASK PANEL ===== */
+#taskPanel{
+  position:fixed;
+  top:60px;
+  right:10px;
+  width:300px;
+  background:rgba(255,255,255,0.98);
+  border:1px solid #ccc;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  z-index:1200;
+  display:none;
+  font-family:Arial,sans-serif;
+}
+
+#taskPanel .panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 14px;
+  font-weight:bold;
+  font-size:16px;
+  background:#007bff;
+  color:#fff;
+  border-top-left-radius:8px;
+  border-top-right-radius:8px;
+}
+
 #closeTasksBtn{
   background:none;
   border:none;
-  color:#000;
+  color:#fff;
   font-size:18px;
   cursor:pointer;
+    /* 🔹 thêm các dòng dưới để ép sát mép phải */
+  margin-right: -24px; /* hoặc -6px nếu muốn sát hơn nữa */
+  padding-right: 0;
 }
 
 #taskPanel .task-content{
@@ -73,33 +104,15 @@
 
 @media (max-width:768px){
   #taskPanel{
-    position: fixed;       /* chắc chắn panel được định vị tuyệt đối trên màn hình */
-    top:10px;
-    bottom:auto;
-    left:50%;              /* đặt tâm của panel ở giữa màn hình */
-    transform: translateX(-50%); /* dịch trái 1/2 chiều rộng để thật sự nằm giữa */
-    width:80%;
+    top:auto;
+    bottom:120px;  /* đẩy xuống thêm để không che menu */
+    right:5px;
+    left:auto;
+    width:90%;
   }
 }
 
 
-#taskPanel .panel-header {
-  position: relative;       /* để tiêu đề vẫn hiển thị bình thường */
-  padding-right: 35px;      /* chừa khoảng cho nút X */
-}
-
-#closeTasksBtn {
-  position: absolute;
-  top: 0;                   /* sát cạnh trên của .panel-header */
-  right: 0;                 /* sát mép phải panel */
-  background: none;
-  border: none;
-  font-size: 18px;          /* tuỳ chỉnh */
-  cursor: pointer;
-  line-height: 1;           /* tránh dính khoảng trống */
-}
-
-.lot-item:hover { cursor:pointer; background:#f9f9f9; }
 </style>
 </head>
 <body>
@@ -126,7 +139,7 @@
 </ul></li>
 <li><button>📜 Pháp lý ▾</button>
 <ul class="submenu">
-<li><button id="legalBtn">📖 Sổ đỏ</button></li>
+<li><button>📖 Sổ đỏ</button></li>
 </ul></li>
 </ul>
 </nav>
@@ -155,56 +168,10 @@
 window.onload=function(){
 const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
 const sheetTaskUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json&gid=693737777";
-const sheetLegalUrl = "https://docs.google.com/spreadsheets/d/1yLzyQRiZjOxwXDNL2gKtzTULA9ODTcS0bLXTOxqELBE/gviz/tq?tqx=out:json";
+
 let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
 let taskData=[],highlightLayers=[];
-function drawLegalLots(){
-  // xóa hết layer cũ
-  polygonGroup.clearLayers();
-  polygons = [];
-  labelsVisible = false;
-  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
 
-  fetch(sheetLegalUrl)
-    .then(res=>res.text())
-    .then(txt=>{
-      const match = txt.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-      if(!match) { console.error("Không đọc được sheet sổ đỏ"); return; }
-      const rows = JSON.parse(match[1]).table.rows;
-
-      rows.forEach(r=>{
-        const [stt,name,areaRaw,coordsStr,note] = r.c.map(c=>c?.v);
-        if(!coordsStr) return;
-        const coords = JSON.parse(coordsStr);
-        const area = parseFloat(areaRaw)||0;
-
-        const poly = L.polygon(coords,{
-          color: "blue",
-          weight: 1,
-          fillColor: "#add8e6",
-          fillOpacity: 0.4
-        }).addTo(polygonGroup);
-
-        poly.options.name = name;
-
-        poly.bindPopup(
-          `<b>${name}</b><br>Diện tích: ${area} ha<br>${note?note:""}`
-        );
-
-        // Tooltip cố định giữa polygon
-        poly.myTooltip = L.tooltip({
-          permanent:true,
-          direction:"center",
-          className:"custom-label"
-        })
-        .setContent(`${name}<br>${area} ha`)
-        .setLatLng(poly.getBounds().getCenter());
-
-        polygons.push(poly);
-      });
-    })
-    .catch(err=>console.error("Lỗi fetch sổ đỏ:",err));
-}
 function parseDate_fromSheet(str){
   if(!str) return null;
   str=String(str).trim();
@@ -298,18 +265,15 @@ function drawData(filterCrop){
       else if(crop==="Sắn") fillColor="green";
       else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
     }else{
-      if(crop==="Cỏ"){
-        fillColor="yellow";
-        if(monthsElapsed>=3){color="red";weight=2;totalGrassArea+=area}
+      if(crop==="Cỏ"||crop==="Sắn"){
+        fillColor=(crop==="Cỏ")?"yellow":"green";
+        if(monthsElapsed>=3){color="red";weight=2;}
+        if(monthsElapsed>=3) crop==="Cỏ"?totalGrassArea+=area:totalCassavaArea+=area;
         fillOpacity=Math.min(1,monthsElapsed/6);
-      }else if(crop==="Sắn"){
-        fillColor="green";
-        if(monthsElapsed>=10){color="red";weight=2;totalCassavaArea+=area;}
-        fillOpacity=Math.min(1,monthsElapsed/6*3/10);
       }else if(crop==="Ngô"){
         fillColor="orange";
-        if(monthsElapsed>=6){color="red";weight=2;totalCornArea+=area;}
-        fillOpacity=Math.min(1,monthsElapsed/6*3/6);
+        if(monthsElapsed>=3){color="red";weight=2;totalCornArea+=area;}
+        fillOpacity=Math.min(1,monthsElapsed/6);
       }else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
     }
 
@@ -363,54 +327,31 @@ const taskDateInput = document.getElementById("taskDate");
 const taskListDiv = document.getElementById("taskList");
 
 // click button daily task
-document.getElementById("dailyTaskBtn").addEventListener("click", function () {
+document.getElementById("dailyTaskBtn").addEventListener("click",function(){
+  // 🔹 Khi mở panel, luôn đưa bản đồ về chế độ Tổng thể
   drawData("all");
-  document.querySelector(".toggle-labels-btn").innerHTML = "👁️ Hiện nhãn";
+  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
   labelsVisible = false;
 
-  // 🔹 Lấy ngày địa phương, KHÔNG dùng toISOString()
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
+  // 🔹 Set ngày hiện tại cho input
+  const today = new Date();
+  const isoToday = today.toISOString().split('T')[0]; // yyyy-mm-dd
+  taskDateInput.value = isoToday;
 
-  // Set input = hôm nay (giờ địa phương)
-  taskDateInput.value = `${yyyy}-${mm}-${dd}`;
+  // 🔹 Đổi tiêu đề
+  document.getElementById("taskPanelTitle").textContent =
+      "Công việc ngày " +
+      today.getDate().toString().padStart(2,'0') + "/" +
+      (today.getMonth()+1).toString().padStart(2,'0') + "/" +
+      today.getFullYear();
 
-
-  // Hàm cập nhật tiêu đề (gọi cả khi mở panel & khi đổi ngày)
-  function updateTitle() {
-    const selected = new Date(taskDateInput.value); // ngày chọn
-    const today = new Date();                       // bây giờ
-
-    // Đưa cả hai về nửa đêm để so sánh ngày, không so sánh giờ
-    today.setHours(0,0,0,0);
-    selected.setHours(0,0,0,0);
-
-    const d = String(selected.getDate()).padStart(2,"0");
-    const m = String(selected.getMonth() + 1).padStart(2,"0");
-    const y = selected.getFullYear();
-
-    const isFuture = selected.getTime() > today.getTime();
-    document.getElementById("taskPanelTitle").textContent =
-        "Công việc ngày " + d + "/" + m + "/" + y + (isFuture ? " (dự kiến)" : "");
-  }
-
-  updateTitle();            // khi mở panel
-  taskDateInput.onchange = updateTitle; // khi người dùng đổi ngày
-
+  // 🔹 Hiển thị panel và load công việc của hôm nay
   taskPanel.style.display = "block";
   showTasks();
 });
 
 
-taskDateInput.addEventListener("change", function () {
-  if (this.value) {
-    updateTaskPanelTitle(new Date(this.value));
-  }
-  showTasks();
-});
-
+taskDateInput.addEventListener("change", showTasks);
   // nút đóng
 document.getElementById("closeTasksBtn").addEventListener("click",function(){
   taskPanel.style.display="none";
@@ -418,10 +359,6 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
   highlightLayers=[];
   taskListDiv.innerHTML="";
 });
-  document.getElementById("legalBtn").addEventListener("click", function(){
-  drawLegalLots();
-});
-
 // fetch task sheet
 fetch(sheetTaskUrl)
   .then(res => res.text())
@@ -431,22 +368,7 @@ fetch(sheetTaskUrl)
       taskData = JSON.parse(match[1]).table.rows;
     }
   });
-function updateTaskPanelTitle(selectedDate) {
-  // 🔹 Đưa cả 2 về 0 giờ để so sánh chỉ theo ngày
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  selectedDate.setHours(0,0,0,0);
 
-  let suffix = "";
-  if (selectedDate > today) suffix = " (dự kiến)";
-
-  const dd = String(selectedDate.getDate()).padStart(2,'0');
-  const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
-  const yyyy = selectedDate.getFullYear();
-
-  document.getElementById("taskPanelTitle").textContent =
-      "Công việc ngày " + dd + "/" + mm + "/" + yyyy + suffix;
-}
 // handle date change
 function showTasks(){
 // cập nhật tiêu đề khi đổi ngày
@@ -492,55 +414,7 @@ if (taskDateInput.value) {
     }
 
     const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity})`).join("<br>");
-    taskListDiv.innerHTML += `
-    <div class="lot-item" data-lot="${lot}">
-      <b>Lô ${lot}</b><br>${tasksHTML}
-    </div><hr>`;
-// Gắn sự kiện hover cho từng dòng công việc
-document.querySelectorAll('#taskList .lot-item').forEach(item=>{
-  let blinkTimer;
-  item.addEventListener('mouseenter', ()=>{
-    const lotName = item.dataset.lot;
-    const poly = polygons.find(p=>p.options.name===lotName);
-    if(!poly) return;
-
-    // Lưu style gốc
-    const original = {
-      fillColor: poly.options.fillColor || 'red', // nếu chưa có sẽ dùng đỏ
-      fillOpacity: poly.options.fillOpacity || 0
-    };
-
-    let visible = false;
-    blinkTimer = setInterval(()=>{
-      if (visible) {
-        // trở lại trong suốt
-        poly.setStyle({ fillOpacity: 0 });
-      } else {
-        // 🔴 tô nền đỏ mờ
-        poly.setStyle({ fillColor: 'red', fillOpacity: 0.4 });
-      }
-      visible = !visible;
-    }, 400); // tốc độ nhấp nháy 0.4s
-
-    item.dataset.blinkTimer = blinkTimer;
-    item.dataset.origFillColor = original.fillColor;
-    item.dataset.origFillOpacity = original.fillOpacity;
-  });
-
-  item.addEventListener('mouseleave', ()=>{
-    const lotName = item.dataset.lot;
-    const poly = polygons.find(p=>p.options.name===lotName);
-    if(poly){
-      // Trả lại nền gốc
-      poly.setStyle({
-        fillColor: item.dataset.origFillColor,
-        fillOpacity: Number(item.dataset.origFillOpacity)
-      });
-    }
-    clearInterval(item.dataset.blinkTimer);
-  });
-});
-
+    taskListDiv.innerHTML += `<b>Lô ${lot}</b><br>${tasksHTML}<br><hr>`;
   }
 }
 
@@ -557,27 +431,6 @@ document.getElementById("closeTasksBtn").addEventListener("click",function(){
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
