@@ -407,6 +407,7 @@ window.onload = function () {
   const taskListDiv = document.getElementById('taskList');
 
   document.getElementById('dailyTaskBtn').addEventListener('click', function () {
+    drawCrops('all');
     if (!anyLegalChecked() && !map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
     const now = new Date(); const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
     taskDateInput.value = `${yyyy}-${mm}-${dd}`;
@@ -517,6 +518,7 @@ const menuEl = document.querySelector('#menu .menu');
 </script>
 </body>
 </html>
+
 
 
 
