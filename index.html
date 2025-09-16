@@ -444,15 +444,6 @@ window.onload = function () {
     });
   }
 
-  function updateTaskPanelTitle(selectedDate) {
-    if (!selectedDate) return;
-    const today = new Date(); today.setHours(0, 0, 0, 0); selectedDate.setHours(0, 0, 0, 0);
-    const suffix = selectedDate > today ? ' (dự kiến)' : '';
-    const dd = String(selectedDate.getDate()).padStart(2, '0');
-    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const yyyy = selectedDate.getFullYear();
-    document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
-  }
   // ----- mobile menu open/close (sửa logic để chỉ tác động top-level trên mobile)
   const hamburgerBtn = document.getElementById('hamburger');
   hamburgerBtn.addEventListener('click', function(){
@@ -492,23 +483,67 @@ document.querySelectorAll('#menu .menu > li > button').forEach(btn => {
   });
 });
   // Đóng menu và reset bản đồ khi click nút con (mobile + desktop)
-document.querySelectorAll('#menu .final-item').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const menuEl = document.querySelector('#menu .menu');
-    if (window.innerWidth <= 768) menuEl.classList.remove('show'); // ẩn menu trên mobile
-    hamburger.setAttribute('aria-expanded', 'false');
+// --- Helper: Update tiêu đề task panel ---
+  function updateTaskPanelTitle(selectedDate) {
+    if (!selectedDate) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    selectedDate.setHours(0,0,0,0);
+    const suffix = selectedDate > today ? ' (dự kiến)' : '';
+    const dd = String(selectedDate.getDate()).padStart(2,'0');
+    const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
+    const yyyy = selectedDate.getFullYear();
+    document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
+  }
 
-    const text = this.textContent.trim();
-    // Nếu là nút con bên trong menu công việc hoặc nút KHÔNG phải cây trồng
-    if (!text.includes('Cây trồng')) {
-      resetLegalView();    // bỏ chọn các checkbox pháp lý
-      drawCrops('all');    // hiển thị tổng thể tất cả cây trồng
-    }
+  // --- Top-level menu ---
+  document.querySelectorAll('#menu .menu > li > button').forEach(topBtn => {
+    topBtn.addEventListener('click', function() {
+      const li = this.parentElement;
+
+      // Mobile: toggle submenu
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('#menu .menu>li').forEach(item => {
+          if (item !== li) item.classList.remove('open');
+        });
+        li.classList.toggle('open');
+      }
+
+      // Top-level khác Cây trồng: reset pháp lý + show tổng thể
+      if (!this.textContent.includes('Cây trồng')) {
+        resetLegalView();
+        drawCrops('all');
+      }
+    });
   });
-});
+
+  // --- Submenu items ---
+  document.querySelectorAll('#menu .final-item').forEach(subBtn => {
+    subBtn.addEventListener('click', function() {
+      // Mobile: ẩn menu khi click item
+      if (window.innerWidth <= 768) {
+        menuEl.classList.remove('show');
+        hamburgerBtn.setAttribute('aria-expanded','false');
+      }
+
+      // Submenu cây trồng
+      if (this.dataset.crop) {
+        drawCrops(this.dataset.crop);
+      }
+
+    });
+  });
+
+
+  // --- Close task panel ---
+  document.getElementById('closeTasksBtn').addEventListener('click', () => {
+    taskPanel.style.display = 'none';
+    clearHighlights();
+    taskListDiv.innerHTML = '';
+  });
 };
 </script>
 </body>
 </html>
+
 
 
