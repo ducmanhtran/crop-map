@@ -455,33 +455,6 @@ window.onload = function () {
 // ----- Đóng menu khi click vào bất kỳ item nào (mobile) -----
 // Đóng menu chính khi click vào mục cuối cùng
 const menuEl = document.querySelector('#menu .menu');
-document.querySelectorAll('#menu .final-item').forEach(link => {
-  link.addEventListener('click', function () {
-    if (window.innerWidth <= 768) {        // chỉ áp dụng trên mobile
-      menuEl.classList.remove('show');     // ẩn toàn bộ menu hamburger
-      hamburger.setAttribute('aria-expanded', 'false');
-    }
-  });
-});
-document.querySelectorAll('#menu .menu > li > button').forEach(btn => {
-  btn.addEventListener('click', function (e) {
-    const li = this.parentElement;
-
-    // Mobile: toggle submenu
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll('#menu .menu>li').forEach(item => { if (item !== li) item.classList.remove('open'); });
-      li.classList.toggle('open');
-    }
-
-    const text = this.textContent.trim();
-
-    // Nếu KHÔNG phải menu "Cây trồng"
-    if (!text.includes('Cây trồng')) {
-      resetLegalView();         // bỏ chọn các checkbox pháp lý
-      drawCrops('all');         // hiển thị tổng thể tất cả cây trồng
-    }
-  });
-});
   // Đóng menu và reset bản đồ khi click nút con (mobile + desktop)
 // --- Helper: Update tiêu đề task panel ---
   function updateTaskPanelTitle(selectedDate) {
@@ -544,6 +517,7 @@ document.querySelectorAll('#menu .menu > li > button').forEach(btn => {
 </script>
 </body>
 </html>
+
 
 
 
