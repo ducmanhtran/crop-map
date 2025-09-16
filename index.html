@@ -503,7 +503,18 @@ const menuEl = document.querySelector('#menu .menu');
       if (this.dataset.crop) {
         drawCrops(this.dataset.crop);
       }
-
+      // Submenu công việc hàng ngày
+      if (this.id === 'dailyTaskBtn') {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth()+1).padStart(2,'0');
+        const dd = String(now.getDate()).padStart(2,'0');
+        taskDateInput.value = `${yyyy}-${mm}-${dd}`;
+        updateTaskPanelTitle(new Date(taskDateInput.value));
+        taskDateInput.onchange = () => { updateTaskPanelTitle(new Date(taskDateInput.value)); showTasks(); };
+        taskPanel.style.display = 'block';
+        showTasks();
+      }
     });
   });
 
@@ -518,6 +529,7 @@ const menuEl = document.querySelector('#menu .menu');
 </script>
 </body>
 </html>
+
 
 
 
