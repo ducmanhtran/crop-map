@@ -506,22 +506,9 @@ document.querySelectorAll('#menu .final-item').forEach(btn => {
     }
   });
 });
-function updateTaskPanelTitle(selectedDate) {
-  if (!selectedDate) return;
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);       // reset giờ, phút, giây
-  selectedDate.setHours(0, 0, 0, 0); 
-
-  const suffix = selectedDate > today ? ' (dự kiến)' : '';  // nếu ngày trong tương lai, thêm chữ dự kiến
-  const dd = String(selectedDate.getDate()).padStart(2,'0');
-  const mm = String(selectedDate.getMonth() + 1).padStart(2,'0');
-  const yyyy = selectedDate.getFullYear();
-
-  document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
-}
 };
 </script>
 </body>
 </html>
+
 
