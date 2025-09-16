@@ -463,6 +463,7 @@ window.onload = function () {
 });
 // ----- Đóng menu khi click vào bất kỳ item nào (mobile) -----
 // Đóng menu chính khi click vào mục cuối cùng
+const menuEl = document.querySelector('#menu .menu');
 document.querySelectorAll('#menu .final-item').forEach(link => {
   link.addEventListener('click', function () {
     if (window.innerWidth <= 768) {        // chỉ áp dụng trên mobile
@@ -477,6 +478,7 @@ document.querySelectorAll('#menu .final-item').forEach(link => {
 </script>
 </body>
 </html>
+
 
 
 
