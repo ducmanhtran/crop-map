@@ -44,31 +44,32 @@
   /* --- HAMBURGER: hiện trên mobile, nền xanh + 3 gạch trắng --- */
   .hamburger-btn{
     display:block;
-    position:absolute;
-    left:10px;top:8px;
+    position:fixed;      /* ✅ cố định trên màn hình */
+    left:10px; top:8px;
     z-index:1100;
-    background:#007bff;      /* nền xanh */
-    color:#fff;              /* 3 gạch trắng */
+    background:#007bff;
+    color:#fff;
     border:none;
     border-radius:6px;
     padding:8px 12px;
     font-size:22px;
     cursor:pointer;
-    box-shadow:0 2px 4px rgba(0,0,0,0.3)
+    box-shadow:0 2px 4px rgba(0,0,0,0.3);
   }
 
-  /* menu vertical & cách xuống 60px khi mở */
   #menu .menu{
+    /* thêm khoảng trống phía trên để không đè nút */
+    margin-top:60px;      /* ✅ tạo khoảng cách */
     display:none;
     grid-template-columns:1fr;
     grid-gap:4px;
     padding:8px;
-    margin:60px 8px 8px;      /* ↓ dịch xuống 60px */
     border-radius:6px;
     background:rgba(255,255,255,0.95);
-    box-shadow:0 2px 6px rgba(0,0,0,0.12)
+    box-shadow:0 2px 6px rgba(0,0,0,0.12);
   }
   #menu.menu-open .menu{display:grid}
+}
 
   #menu .menu>li{
     border:1px solid rgba(0,0,0,0.08);
@@ -144,9 +145,9 @@
 </style>
 </head>
 <body>
+  <button class="hamburger-btn" id="hamburger" aria-label="Mở menu" aria-expanded="false">☰</button>
   <nav id="menu">
     <!-- Hamburger chỉ hiển thị trên mobile -->
-    <button class="hamburger-btn" id="hamburger" aria-label="Mở menu" aria-expanded="false">☰</button>
 
     <ul class="menu">
       <li>
@@ -488,5 +489,6 @@
   </script>
 </body>
 </html>
+
 
 
