@@ -416,8 +416,16 @@ window.onload = function () {
     const yyyy = selectedDate.getFullYear();
     document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
   }
-
+  // ----- mobile menu open/close (sửa logic để chỉ tác động top-level trên mobile)
+  const hamburgerBtn = document.getElementById('hamburger');
+  hamburgerBtn.addEventListener('click', function(e){
+    const menuEl = document.getElementById('menu');
+    menuEl.classList.toggle('menu-open');
+    const is = this.getAttribute('aria-expanded') === 'true';
+    this.setAttribute('aria-expanded', !is);
+  });
 };
 </script>
 </body>
 </html>
+
