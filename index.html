@@ -214,7 +214,18 @@ window.onload = function () {
     return btn;
   };
   toggleBtn.addTo(map);
-
+// --- Helper: Update tiêu đề task panel ---
+  function updateTaskPanelTitle(selectedDate) {
+    if (!selectedDate) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    selectedDate.setHours(0,0,0,0);
+    console.log('today', today, 'selectedDate', selectedDate);
+    const suffix = selectedDate > today ? ' (dự kiến)' : '';
+    const dd = String(selectedDate.getDate()).padStart(2,'0');
+    const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
+    const yyyy = selectedDate.getFullYear();
+    document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
+  }
   // helpers parse
   function parseDate_fromSheet(str) {
     if (!str) return null;
@@ -357,18 +368,7 @@ window.onload = function () {
   }).catch(e => console.error('Lỗi fetch tasks:', e));
 
   function clearHighlights() { highlightGroup.clearLayers(); highlightLayers = []; }
-  // --- Helper: Update tiêu đề task panel ---
-  function updateTaskPanelTitle(selectedDate) {
-    if (!selectedDate) return;
-    const today = new Date(); today.setHours(0,0,0,0);
-    selectedDate.setHours(0,0,0,0);
-    console.log('today', today, 'selectedDate', selectedDate);
-    const suffix = selectedDate > today ? ' (dự kiến)' : '';
-    const dd = String(selectedDate.getDate()).padStart(2,'0');
-    const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
-    const yyyy = selectedDate.getFullYear();
-    document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix;
-  }
+  
   // show tasks
   function showTasks() {
     if (!taskDateInput.value) return;
@@ -527,6 +527,7 @@ const menuEl = document.querySelector('#menu .menu');
 </script>
 </body>
 </html>
+
 
 
 
