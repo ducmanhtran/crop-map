@@ -85,15 +85,32 @@
 }
     @media (max-width:768px){
   #menu .submenu{
-    position:relative;      /* đổi từ absolute sang relative để nằm hẳn trong khối menu dọc */
-    z-index:2000;           /* cao hơn cả map và các mục khác */
-    background:#fff;
-    margin-left:0;           /* bỏ canh trái tuyệt đối */
-    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    position: static;       /* ❗ không dùng absolute trên mobile */
+    display: none;          /* ẩn mặc định */
+    margin: 0;              /* bỏ margin thừa */
+    padding-left: 12px;     /* tạo khoảng cách lùi vào nếu muốn */
+    background: rgba(255,255,255,0.95);
+    box-shadow: none;       /* bỏ bóng nếu không cần */
   }
-  #menu .menu>li.open>.submenu{
-    display:block;          /* hiện submenu khi li có class open */
+  /* khi li có class open thì hiện submenu */
+  #menu .menu > li.open > .submenu{
+    display: block;
   }
+
+  /* có thể tuỳ chỉnh thêm khoảng cách giữa các li */
+  #menu .menu > li{
+    margin-bottom: 4px;
+  }
+  #menu .submenu li button {
+   padding-left: 20px;
+  }
+  #hamburger {
+  color: blue !important;          /* chữ xanh dương mặc định */
+  }
+  #hamburger:hover {
+  color: darkblue !important;
+  }
+
 }
 
   </style>
@@ -445,6 +462,7 @@ window.onload = function () {
 </script>
 </body>
 </html>
+
 
 
 
