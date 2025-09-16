@@ -462,6 +462,7 @@ const menuEl = document.querySelector('#menu .menu');
     if (!selectedDate) return;
     const today = new Date(); today.setHours(0,0,0,0);
     selectedDate.setHours(0,0,0,0);
+    console.log('today', today, 'selectedDate', selectedDate);
     const suffix = selectedDate > today ? ' (dự kiến)' : '';
     const dd = String(selectedDate.getDate()).padStart(2,'0');
     const mm = String(selectedDate.getMonth()+1).padStart(2,'0');
@@ -529,6 +530,7 @@ const menuEl = document.querySelector('#menu .menu');
 </script>
 </body>
 </html>
+
 
 
 
