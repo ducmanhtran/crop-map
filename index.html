@@ -461,19 +461,24 @@ window.onload = function () {
   const is = this.getAttribute('aria-expanded') === 'true';
   this.setAttribute('aria-expanded', !is);
 });
-  // Chọn toàn bộ các link hoặc button trong menu
-  document.querySelectorAll('#menu a, #menu button').forEach(item => {
+// ----- Đóng menu khi click vào bất kỳ item nào (mobile) -----
+const hamburgerBtn = document.getElementById('hamburger');
+const menuEl = document.querySelector('#menu .menu');
+
+document.querySelectorAll('#menu [data-crop], #menu .submenu button, #menu .submenu label').forEach(item => {
   item.addEventListener('click', function () {
-    // Đóng menu hamburger
-    menu.classList.remove('open');
-    hamburger.classList.remove('active');
-    hamburger.setAttribute('aria-expanded','false');
+    if (window.innerWidth <= 768) {           // chỉ áp dụng trên mobile
+      menuEl.classList.remove('show');        // ẩn toàn bộ menu
+      hamburgerBtn.setAttribute('aria-expanded','false');
+    }
   });
 });
+
 };
 </script>
 </body>
 </html>
+
 
 
 
