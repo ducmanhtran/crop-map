@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Bản đồ trồng trọt</title>
+<title>Bản đồ trồng trọt - Hoà Phát Quảng Bình</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -18,6 +18,12 @@
 #menu .submenu button{width:100%;text-align:left;padding:10px 14px;font-size:14px;color:#333;background:none;border:none;}
 #menu .submenu button:hover{background:#f0f0f0;color:#007bff;}
 #menu .menu>li:hover>.submenu{display:block;}
+#menu .submenu label{
+  font-size:14px;
+  color:#333;
+  display:block;
+  cursor:pointer;
+}
 @media(max-width:768px){
   #infoBox{bottom:80px;left:5px;font-size:13px;padding:6px 10px;}
   #menu .menu{display:grid;grid-template-columns:1fr 1fr;grid-gap:4px;padding:4px;}
@@ -40,44 +46,13 @@
 /* ===== TASK PANEL ===== */
 #taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none;}
 #taskPanel label{font-weight:bold;}
-#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;
-/* ===== TASK PANEL ===== */
-#taskPanel{
-  position:fixed;
-  top:60px;
-  right:10px;
-  width:300px;
-  background:rgba(255,255,255,0.98);
-  border:1px solid #ccc;
-  border-radius:8px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.25);
-  z-index:1200;
-  display:none;
-  font-family:Arial,sans-serif;
-}
-
-#taskPanel .panel-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 14px;
-  font-weight:bold;
-  font-size:16px;
-  background:#007bff;
-  color:#fff;
-  border-top-left-radius:8px;
-  border-top-right-radius:8px;
-}
-
+#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px;}
 #closeTasksBtn{
   background:none;
   border:none;
-  color:#fff;
+  color:#000;
   font-size:18px;
   cursor:pointer;
-    /* 🔹 thêm các dòng dưới để ép sát mép phải */
-  margin-right: -24px; /* hoặc -6px nếu muốn sát hơn nữa */
-  padding-right: 0;
 }
 
 #taskPanel .task-content{
@@ -104,14 +79,47 @@
 
 @media (max-width:768px){
   #taskPanel{
-    top:auto;
-    bottom:120px;  /* đẩy xuống thêm để không che menu */
-    right:5px;
-    left:auto;
-    width:90%;
+    position: fixed;       /* chắc chắn panel được định vị tuyệt đối trên màn hình */
+    top:10px;
+    bottom:auto;
+    left:50%;              /* đặt tâm của panel ở giữa màn hình */
+    transform: translateX(-50%); /* dịch trái 1/2 chiều rộng để thật sự nằm giữa */
+    width:80%;
   }
 }
 
+
+#taskPanel .panel-header {
+  position: relative;       /* để tiêu đề vẫn hiển thị bình thường */
+  padding-right: 35px;      /* chừa khoảng cho nút X */
+}
+
+#closeTasksBtn {
+  position: absolute;
+  top: 0;                   /* sát cạnh trên của .panel-header */
+  right: 0;                 /* sát mép phải panel */
+  background: none;
+  border: none;
+  font-size: 18px;          /* tuỳ chỉnh */
+  cursor: pointer;
+  line-height: 1;           /* tránh dính khoảng trống */
+}
+
+.lot-item:hover { cursor:pointer; background:#f9f9f9; }
+  /* Giống kiểu chữ của các mục cỏ, sắn */
+#menu .submenu li label {
+    font-family: inherit;        /* dùng cùng font với menu */
+    font-size: 14px;             /* hoặc cùng size như nút menu con */
+    font-weight: 600;            /* nếu mục cỏ/sắn đang đậm thì để 600 */
+    line-height: 1.4;
+    display: flex;               /* căn checkbox và chữ ngang hàng */
+    align-items: center;
+    gap: 6px;                    /* khoảng cách checkbox – chữ */
+}
+#menu .submenu li label input[type="checkbox"] {
+    transform: scale(1.1);       /* tuỳ chỉnh: to hơn chút cho đồng đều */
+    margin: 0;
+}
 
 </style>
 </head>
@@ -129,8 +137,6 @@
 <li><button>🛠️ Công việc ▾</button>
 <ul class="submenu">
 <li><button id="dailyTaskBtn">📅 Công việc hàng ngày</button></li>
-<li><button>📝 Lưu ý công việc</button></li>
-<li><button>📊 Báo cáo tuần</button></li>
 </ul></li>
 <li><button>🏗️ Hạ tầng ▾</button>
 <ul class="submenu">
@@ -139,154 +145,121 @@
 </ul></li>
 <li><button>📜 Pháp lý ▾</button>
 <ul class="submenu">
-<li><button>📖 Sổ đỏ</button></li>
-</ul></li>
+<li><label><input type="checkbox" id="chkCompanyLegal"> Sổ đỏ công ty</label></li>
+<li><label><input type="checkbox" id="chkActualLots"> Hiện trạng </label></li>
+<li><label><input type="checkbox" id="chkDisputed"> Đất lấn chiếm </label></li>
+</ul>
+</li>
 </ul>
 </nav>
 
 <div id="map"></div>
 <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
-<div id="infoBox" style="display:none;"></div>
-
+<div id="infoBox" style="display:none"></div>
 <div id="taskPanel">
 <div class="panel-header">
   <span id="taskPanelTitle">Công việc hàng ngày</span>
   <button id="closeTasksBtn">✖</button>
 </div>
 
-
-  <div id="taskList" class="task-content">
-    <!-- Danh sách công việc sẽ được load tự động -->
-  </div>
+  <div id="taskList" class="task-content"></div>
 
   <label for="taskDate" class="date-label">Chọn ngày:</label>
   <input type="date" id="taskDate">
 </div>
 
-
 <script>
 window.onload=function(){
-const sheetCropsUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
-const sheetTaskUrl="https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json&gid=693737777";
+// ====== URLs (đã cung cấp)
+const sheetCropsUrl = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json";
+const sheetTaskUrl  = "https://docs.google.com/spreadsheets/d/13II_ZFEvrxK2qd0mkIX-0TNPdUH5ac4NFykmjqEPCZM/gviz/tq?tqx=out:json&gid=693737777";
+const sheetLegalUrl = "https://docs.google.com/spreadsheets/d/1yLzyQRiZjOxwXDNL2gKtzTULA9ODTcS0bLXTOxqELBE/gviz/tq?tqx=out:json";
+const sheetDisputedUrl = "https://docs.google.com/spreadsheets/d/1yLzyQRiZjOxwXDNL2gKtzTULA9ODTcS0bLXTOxqELBE/gviz/tq?tqx=out:json&gid=162449209";
 
-let rowsData=[],polygons=[],currentFilter="all",labelsVisible=false;
-let taskData=[],highlightLayers=[];
+// ----- state
+let rowsData = [], polygons = [], labelsVisible = false;
+let taskData = [], highlightLayers = [];
 
-function parseDate_fromSheet(str){
-  if(!str) return null;
-  str=String(str).trim();
-  if(str.includes("/")){
-    const parts=str.split("/");
-    if(parts.length===3){
-      const day=parseInt(parts[0],10);
-      const month=parseInt(parts[1],10)-1;
-      const year=parseInt(parts[2],10);
-      return new Date(Date.UTC(year,month,day));
-    }
-  }
-  const match=str.match(/Date\((\d+),(\d+),(\d+)\)/);
-  if(match){
-    const year=parseInt(match[1],10);
-    const month=parseInt(match[2],10);
-    const day=parseInt(match[3],10);
-    return new Date(Date.UTC(year,month,day));
-  }
-  return null;
-}
+// index theo tên để tìm polygon trong mọi layer
+const cropsByName = {};
+const actualByName = {};
+const legalByName = {};
+const disputedByName = {};
 
-function parseTaskDate(dateStr){
-  if(!dateStr) return null;
-
-  // Bắt dạng: Date(YYYY,M,D)
-  const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
-  if (m) {
-    // Tháng trong JS tính từ 0 nên giữ nguyên m[2]
-    return new Date(+m[1], +m[2], +m[3]);
-  }
-
-  // Thử parse chuẩn ISO
-  const d = new Date(dateStr);
-  return isNaN(d) ? null : d;
-}
-
-
-// map
-const map=L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
+// ----- map + groups
+const map = L.map('map',{center:[17.5089721,106.4670833],zoom:13,zoomControl:false});
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-const polygonGroup=L.layerGroup().addTo(map);
 
-// toggle nhãn
-const toggleBtn=L.control({position:'bottomright'});
-toggleBtn.onAdd=function(){
-  const btn=L.DomUtil.create('button','toggle-labels-btn');
-  btn.innerHTML="👁️ Hiện nhãn";
-  btn.onclick=function(){
-    labelsVisible=!labelsVisible;
-    polygons.forEach(p=>{if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip);});
-    btn.innerHTML=labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
+const cropsGroup        = L.layerGroup().addTo(map);
+const companyLegalGroup = L.layerGroup();
+const actualLotsGroup   = L.layerGroup();
+const disputedGroup     = L.layerGroup();
+const highlightGroup    = L.layerGroup().addTo(map); // highlight overlay (luôn tồn tại)
+
+// ----- toggle nhãn
+const toggleBtn = L.control({position:'bottomright'});
+toggleBtn.onAdd = function(){
+  const btn = L.DomUtil.create('button','toggle-labels-btn');
+  btn.innerHTML = "👁️ Hiện nhãn";
+  btn.onclick = function(){
+    labelsVisible = !labelsVisible;
+    polygons.forEach(p=>{ if(labelsVisible) map.addLayer(p.myTooltip); else map.removeLayer(p.myTooltip); });
+    btn.innerHTML = labelsVisible?"🙈 Ẩn nhãn":"👁️ Hiện nhãn";
   };
   return btn;
 };
 toggleBtn.addTo(map);
 
-// drawData
-function drawData(filterCrop){
-  currentFilter=filterCrop;
-  // 🔹 Luôn tắt nhãn khi đổi chế độ
+// ----- helpers parse
+function parseDate_fromSheet(str){
+  if(!str) return null;
+  str = String(str).trim();
+  if(str.includes('/')){
+    const parts = str.split('/'); if(parts.length===3) return new Date(parts[2], parts[1]-1, parts[0]);
+  }
+  const match = str.match(/Date\((\d+),(\d+),(\d+)\)/);
+  if(match) return new Date(+match[1], +match[2], +match[3]);
+  const d = new Date(str); return isNaN(d)?null:d;
+}
+function parseTaskDate(dateStr){ if(!dateStr) return null; const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/); if(m) return new Date(+m[1], +m[2], +m[3]); const d = new Date(dateStr); return isNaN(d)?null:d; }
+
+// ----- draw crops (cập nhật index theo tên)
+function drawCrops(filterCrop){
+    // 🔹 Luôn tắt nhãn khi đổi chế độ
   labelsVisible = false;
   document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
   polygons.forEach(p=>{
     if (p.myTooltip) map.removeLayer(p.myTooltip);
   });
+  cropsGroup.clearLayers(); polygons = []; Object.keys(cropsByName).forEach(k=>delete cropsByName[k]);
 
-  polygonGroup.clearLayers();
-  polygons = [];
-  polygonGroup.clearLayers();
-  polygons=[];
+  const today = new Date();
   let totalGrassArea=0,totalCassavaArea=0,totalCornArea=0;
-  const today=new Date();
-
   rowsData.forEach(row=>{
-    const [name,areaRaw,crop,stage,dateStr,coordsStr]=row.c.map(c=>c?.v);
-    const area=parseFloat(areaRaw)||0;
-    if(!coordsStr) return;
-    if(filterCrop!=="all" && crop!==filterCrop) return;
-    const coords=JSON.parse(coordsStr);
-
-    let color="blue",fillColor="gray",fillOpacity=0.6,weight=0.5;
-
-    const plantDate=parseDate_fromSheet(dateStr);
-    const monthsElapsed=plantDate?((today-plantDate)/(1000*60*60*24*30)):0;
-
-    if(filterCrop==="all"){
-      if(crop==="Cỏ") fillColor="yellow";
-      else if(crop==="Ngô") fillColor="orange";
-      else if(crop==="Sắn") fillColor="green";
-      else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
-    }else{
-      if(crop==="Cỏ"||crop==="Sắn"){
-        fillColor=(crop==="Cỏ")?"yellow":"green";
-        if(monthsElapsed>=3){color="red";weight=2;}
-        if(monthsElapsed>=3) crop==="Cỏ"?totalGrassArea+=area:totalCassavaArea+=area;
-        fillOpacity=Math.min(1,monthsElapsed/6);
-      }else if(crop==="Ngô"){
-        fillColor="orange";
-        if(monthsElapsed>=3){color="red";weight=2;totalCornArea+=area;}
-        fillOpacity=Math.min(1,monthsElapsed/6);
-      }else if(crop==="Đất trống"){fillColor="brown";fillOpacity=0.3;}
+    const [name,areaRaw,crop,stage,dateStr,coordsStr] = row.c.map(c=>c?.v);
+    const area = parseFloat(areaRaw)||0;
+    if(!coordsStr) return; if(filterCrop!=='all' && crop!==filterCrop) return;
+    let coords; try{ coords = JSON.parse(coordsStr); }catch(e){ return; }
+    let color='blue', fillColor='gray', fillOpacity=0.6, weight=0.5;
+    const plantDate = parseDate_fromSheet(dateStr); const monthsElapsed = plantDate?((today-plantDate)/(1000*60*60*24*30)):0;
+    if(filterCrop==='all'){
+      if(crop==='Cỏ') fillColor='yellow'; else if(crop==='Ngô') fillColor='orange'; else if(crop==='Sắn') fillColor='green'; else if(crop==='Đất trống'){ fillColor='brown'; fillOpacity=0.3; }
+    } else {
+      if(crop==='Cỏ'){ fillColor='yellow'; if(monthsElapsed>=3){ color='red'; weight=2;totalGrassArea+=area } fillOpacity=Math.min(1, monthsElapsed/6); }
+      else if(crop==='Sắn'){ fillColor='green'; if(monthsElapsed>=10){ color='red'; weight=2;totalCassavaArea+=area;} fillOpacity=Math.min(1, monthsElapsed/6*3/10); }
+      else if(crop==='Ngô'){ fillColor='orange'; if(monthsElapsed>=6){ color='red'; weight=2;totalCornArea+=area; } fillOpacity=Math.min(1, monthsElapsed/6*3/6); }
+      else if(crop==='Đất trống'){ fillColor='brown'; fillOpacity=0.3; }
     }
-
-    const poly=L.polygon(coords,{color:color,weight:weight,fillColor:fillColor,fillOpacity:fillOpacity}).addTo(polygonGroup);
-    poly.options.name=name;
-    const displayDate = plantDate ? `${plantDate.getUTCDate()}/${plantDate.getUTCMonth()+1}/${plantDate.getUTCFullYear()}` : "Chưa có";
+    const poly = L.polygon(coords,{color,weight,fillColor,fillOpacity}).addTo(cropsGroup);
+    poly.options.name = name;
+    const displayDate = plantDate ? `${plantDate.getDate()}/${plantDate.getMonth()+1}/${plantDate.getFullYear()}` : 'Chưa có';
     poly.bindPopup(`<b>${name}</b><br>Diện tích: ${area} ha<br>Cây: ${crop}<br>Giai đoạn: ${stage}<br>Ngày: ${displayDate}`);
-    poly.myTooltip=L.tooltip({permanent:true,direction:'center',className:'custom-label'}).setContent(`${name}<br>${area} ha`).setLatLng(poly.getBounds().getCenter());
-    if(labelsVisible) map.addLayer(poly.myTooltip);
-
+    poly.myTooltip = L.tooltip({permanent:true,direction:'center',className:'custom-label'})
+      .setContent(`${name}<br>${area} ha`).setLatLng(poly.getBounds().getCenter());
     polygons.push(poly);
+    if(name) cropsByName[String(name)] = poly;
   });
-
   const box=document.getElementById("infoBox");
   if(filterCrop==="Cỏ") {box.style.display="block";box.innerText=`🌱 Cỏ đến hạn thu hoạch: ${totalGrassArea.toFixed(2)} ha`;}
   else if(filterCrop==="Sắn"){box.style.display="block";box.innerText=`🥔 Sắn đến hạn thu hoạch: ${totalCassavaArea.toFixed(2)} ha`;}
@@ -294,143 +267,192 @@ function drawData(filterCrop){
   else{box.style.display="none";}
 }
 
-// fetch crops sheet
-fetch(sheetCropsUrl)
-.then(res=>res.text())
-.then(data=>{
-  const match=data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-  if(!match){console.error("Không parse được dữ liệu từ Google Sheet");return;}
-  try{rowsData=JSON.parse(match[1]).table.rows;drawData("all");}catch(err){console.error("Lỗi parse JSON:",err);}
-})
-.catch(err=>console.error("Lỗi fetch Google Sheet:",err));
+// ----- fetch crops
+fetch(sheetCropsUrl).then(r=>r.text()).then(data=>{
+  const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+  if(!match) { console.error('Không parse được dữ liệu crops'); return; }
+  try{ rowsData = JSON.parse(match[1]).table.rows; drawCrops('all'); }catch(e){ console.error('Lỗi parse crops',e); }
+}).catch(e=>console.error('Lỗi fetch crops',e));
 
-// filter crop buttons
-document.querySelectorAll("[data-crop]").forEach(btn=>btn.addEventListener("click",function(){
-  drawData(this.getAttribute("data-crop"));
-}));
+// ----- company legal
+function drawCompanyLegal(){ legalByName && Object.keys(legalByName).forEach(k=>delete legalByName[k]); companyLegalGroup.clearLayers();
+  fetch(sheetLegalUrl).then(r=>r.text()).then(txt=>{
+    const match = txt.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+    if(!match) return;
+    const rows = JSON.parse(match[1]).table.rows;
+    rows.forEach(r=>{
+      const [stt,name,areaRaw,coordsStr,note] = r.c.map(c=>c?.v);
+      if(!coordsStr) return; let coords; try{ coords=JSON.parse(coordsStr);}catch(e){return;}
+      const poly = L.polygon(coords,{color:'blue',weight:1,fillColor:'#add8e6',fillOpacity:0.4}).addTo(companyLegalGroup);
+      poly.bindPopup(`<b>${name}</b><br>Diện tích: ${areaRaw||''} ha<br>${note?note:''}`);
+      if(name) legalByName[String(name)] = poly;
+    });
+  }).catch(err=>console.error('Lỗi fetch sổ đỏ:',err));
+}
 
-// mobile menu
-if(window.innerWidth<=768){
-  document.querySelectorAll("#menu .menu>li>button").forEach(btn=>{
-    btn.addEventListener("click",function(e){
-      e.preventDefault();
-      const li=this.parentElement;
-      document.querySelectorAll("#menu .menu>li").forEach(item=>{if(item!==li) item.classList.remove("open");});
-      li.classList.toggle("open");
+// ----- actual lots
+function drawActualLots(){ actualByName && Object.keys(actualByName).forEach(k=>delete actualByName[k]); actualLotsGroup.clearLayers();
+  rowsData.forEach(r=>{
+    const [name,areaRaw,crop,stage,dateStr,coordsStr] = r.c.map(c=>c?.v);
+    if(!coordsStr) return; let coords; try{ coords = JSON.parse(coordsStr);}catch(e){return;}
+    const poly = L.polygon(coords,{color:'green',weight:1,fillColor:'#b0f2b6',fillOpacity:0.4}).addTo(actualLotsGroup);
+    poly.bindPopup(`<b>${name}</b><br>${areaRaw} ha`);
+    if(name) actualByName[String(name)] = poly;
+  });
+}
+
+// ----- disputed
+function drawDisputedLots(){ disputedByName && Object.keys(disputedByName).forEach(k=>delete disputedByName[k]); disputedGroup.clearLayers();
+  fetch(sheetDisputedUrl).then(r=>r.text()).then(txt=>{
+    const match = txt.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+    if(!match) return; const rows = JSON.parse(match[1]).table.rows;
+    rows.forEach(r=>{
+      const [stt,name,areaRaw,coordsStr,note] = r.c.map(c=>c?.v);
+      if(!coordsStr) return; let coords; try{ coords = JSON.parse(coordsStr);}catch(e){return;}
+      const poly = L.polygon(coords,{color:'red',weight:2,fillColor:'#f5b7b1',fillOpacity:0.5}).addTo(disputedGroup);
+      poly.bindPopup(`<b>${name}</b><br>Diện tích: ${areaRaw||''} ha<br>${note?note:''}`);
+      if(name) disputedByName[String(name)] = poly;
+    });
+  }).catch(err=>console.error('Lỗi fetch disputed:',err));
+}
+
+// ----- helper: kiểm tra pháp lý có checkbox nào đang bật
+function anyLegalChecked(){
+  return document.getElementById('chkCompanyLegal').checked || document.getElementById('chkActualLots').checked || document.getElementById('chkDisputed').checked;
+}
+
+// ----- checkbox events: khi bật mục pháp lý thì tắt lớp cây trồng
+document.getElementById('chkCompanyLegal').addEventListener('change', function(){
+  if(this.checked){ if(map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup);highlightGroup.clearLayers();  drawCompanyLegal(); map.addLayer(companyLegalGroup); }
+  else{ companyLegalGroup.clearLayers(); map.removeLayer(companyLegalGroup); if(!anyLegalChecked()) map.addLayer(cropsGroup); }
+});
+document.getElementById('chkActualLots').addEventListener('change', function(){
+  if(this.checked){ if(map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup);highlightGroup.clearLayers();  drawActualLots(); map.addLayer(actualLotsGroup); }
+  else{ actualLotsGroup.clearLayers(); map.removeLayer(actualLotsGroup); if(!anyLegalChecked()) map.addLayer(cropsGroup); }
+});
+document.getElementById('chkDisputed').addEventListener('change', function(){
+  if(this.checked){ if(map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup);highlightGroup.clearLayers();  drawDisputedLots(); map.addLayer(disputedGroup); }
+  else{ disputedGroup.clearLayers(); map.removeLayer(disputedGroup); if(!anyLegalChecked()) map.addLayer(cropsGroup); }
+});
+
+// ----- fetch tasks
+fetch(sheetTaskUrl).then(res=>res.text()).then(data=>{
+  const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+  if(match) taskData = JSON.parse(match[1]).table.rows;
+}).catch(e=>console.error('Lỗi fetch tasks:',e));
+
+// ----- highlight helpers
+function clearHighlights(){ highlightGroup.clearLayers(); highlightLayers = []; }
+
+// ----- show tasks (tìm polygon theo tên trong mọi layer index)
+function showTasks(){
+  if(!taskDateInput.value) return;
+  const selectedDate = new Date(taskDateInput.value);
+  document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + String(selectedDate.getDate()).padStart(2,'0') + '/' + String(selectedDate.getMonth()+1).padStart(2,'0') + '/' + selectedDate.getFullYear();
+
+  clearHighlights();
+
+  const dayTasks = taskData.filter(row=>{ const [stt,dateStr,lot,content,quantity] = row.c.map(c=>c?.v); const d = parseTaskDate(dateStr); return d && d.toDateString() === selectedDate.toDateString(); });
+
+  taskListDiv.innerHTML = '';
+  const lotTasksMap = {};
+  dayTasks.forEach(row=>{ const [stt,dateStr,lot,content,quantity] = row.c.map(c=>c?.v); if(!lot) return; if(!lotTasksMap[lot]) lotTasksMap[lot]=[]; lotTasksMap[lot].push({content,quantity}); });
+
+  for(const lot in lotTasksMap){
+    // tìm polygon trong index (crops, actual, legal, disputed)
+    const poly = cropsByName[lot] || actualByName[lot] || legalByName[lot] || disputedByName[lot];
+    if(poly){
+      const highlight = L.polygon(poly.getLatLngs(),{color:'red',weight:3,fill:false}).addTo(highlightGroup);
+      highlightLayers.push(highlight);
+    }
+    const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity||''})`).join('<br>');
+    taskListDiv.innerHTML += `<div class="lot-item" data-lot="${lot}"><b>Lô ${lot}</b><br>${tasksHTML}</div><hr>`;
+  }
+
+  // hover effects: tạo polygon nhấp nháy trong highlightGroup
+  document.querySelectorAll('#taskList .lot-item').forEach(item=>{
+    let blink = null; let blinkPoly = null;
+    item.addEventListener('mouseenter', ()=>{
+      const lotName = item.dataset.lot;
+      const basePoly = cropsByName[lotName] || actualByName[lotName] || legalByName[lotName] || disputedByName[lotName];
+      if(!basePoly) return;
+      const coords = basePoly.getLatLngs();
+      // tạo poly nhấp nháy
+      blinkPoly = L.polygon(coords,{color:'red',weight:0,fillColor:'red',fillOpacity:0}).addTo(highlightGroup);
+      let visible = false;
+      blink = setInterval(()=>{ blinkPoly.setStyle({fillOpacity: visible?0:0.4}); visible = !visible; }, 400);
+      item.dataset.blinkId = blink;
+      item.dataset.blinkPoly = '1';
+    });
+    item.addEventListener('mouseleave', ()=>{
+      if(item.dataset.blinkId){ clearInterval(item.dataset.blinkId); }
+      if(blinkPoly) { highlightGroup.removeLayer(blinkPoly); blinkPoly = null; }
+      item.removeAttribute('data-blinkid');
     });
   });
 }
 
-// TASK PANEL
-const taskPanel = document.getElementById("taskPanel");
-const taskDateInput = document.getElementById("taskDate");
-const taskListDiv = document.getElementById("taskList");
+// ----- UI: mở panel công việc
+const taskPanel = document.getElementById('taskPanel');
+const taskDateInput = document.getElementById('taskDate');
+const taskListDiv = document.getElementById('taskList');
 
-// click button daily task
-document.getElementById("dailyTaskBtn").addEventListener("click",function(){
-  // 🔹 Khi mở panel, luôn đưa bản đồ về chế độ Tổng thể
-  drawData("all");
-  document.querySelector('.toggle-labels-btn').innerHTML = "👁️ Hiện nhãn";
-  labelsVisible = false;
-
-  // 🔹 Set ngày hiện tại cho input
-  const today = new Date();
-  const isoToday = today.toISOString().split('T')[0]; // yyyy-mm-dd
-  taskDateInput.value = isoToday;
-
-  // 🔹 Đổi tiêu đề
-  document.getElementById("taskPanelTitle").textContent =
-      "Công việc ngày " +
-      today.getDate().toString().padStart(2,'0') + "/" +
-      (today.getMonth()+1).toString().padStart(2,'0') + "/" +
-      today.getFullYear();
-
-  // 🔹 Hiển thị panel và load công việc của hôm nay
-  taskPanel.style.display = "block";
-  showTasks();
+document.getElementById('dailyTaskBtn').addEventListener('click', function(){
+  // khi mở panel muốn luôn thấy lớp cây trồng nếu chưa có pháp lý bật
+  if(!anyLegalChecked() && !map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
+  const now = new Date(); const yyyy = now.getFullYear(); const mm = String(now.getMonth()+1).padStart(2,'0'); const dd = String(now.getDate()).padStart(2,'0');
+  taskDateInput.value = `${yyyy}-${mm}-${dd}`;
+  function updateTitle(){ const selected = new Date(taskDateInput.value); const today = new Date(); today.setHours(0,0,0,0); selected.setHours(0,0,0,0); const d = String(selected.getDate()).padStart(2,'0'); const m = String(selected.getMonth()+1).padStart(2,'0'); const y = selected.getFullYear(); const isFuture = selected.getTime() > today.getTime(); document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + d + '/' + m + '/' + y + (isFuture? ' (dự kiến)':''); }
+  updateTitle(); taskDateInput.onchange = ()=>{ updateTaskPanelTitle(new Date(taskDateInput.value)); showTasks(); };
+  taskPanel.style.display='block'; showTasks();
 });
 
+function updateTaskPanelTitle(selectedDate){ if(!selectedDate) return; const today = new Date(); today.setHours(0,0,0,0); selectedDate.setHours(0,0,0,0); const suffix = selectedDate>today? ' (dự kiến)':''; const dd=String(selectedDate.getDate()).padStart(2,'0'); const mm=String(selectedDate.getMonth()+1).padStart(2,'0'); const yyyy=selectedDate.getFullYear(); document.getElementById('taskPanelTitle').textContent = 'Công việc ngày ' + dd + '/' + mm + '/' + yyyy + suffix; }
 
-taskDateInput.addEventListener("change", showTasks);
-  // nút đóng
-document.getElementById("closeTasksBtn").addEventListener("click",function(){
-  taskPanel.style.display="none";
-  highlightLayers.forEach(l=>polygonGroup.removeLayer(l));
-  highlightLayers=[];
-  taskListDiv.innerHTML="";
-});
-// fetch task sheet
-fetch(sheetTaskUrl)
-  .then(res => res.text())
-  .then(data => {
-    const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-    if(match){
-      taskData = JSON.parse(match[1]).table.rows;
-    }
-  });
+document.getElementById('taskDate').addEventListener('change', function(){ if(this.value) updateTaskPanelTitle(new Date(this.value)); showTasks(); });
 
-// handle date change
-function showTasks(){
-// cập nhật tiêu đề khi đổi ngày
-if (taskDateInput.value) {
-  const d = new Date(taskDateInput.value);
-  document.getElementById("taskPanelTitle").textContent =
-      "Công việc ngày " +
-      d.getDate().toString().padStart(2,'0') + "/" +
-      (d.getMonth()+1).toString().padStart(2,'0') + "/" +
-      d.getFullYear();
-}
-  const selectedDate = new Date(taskDateInput.value);
-  if(!taskDateInput.value) return;
-  console.log("selectedDate:", selectedDate.toDateString(), taskDateInput.value);
-  // xóa highlight cũ
-  highlightLayers.forEach(l=>polygonGroup.removeLayer(l));
-  highlightLayers = [];
+document.getElementById('closeTasksBtn').addEventListener('click', function(){ taskPanel.style.display='none'; clearHighlights(); taskListDiv.innerHTML=''; });
 
-  const dayTasks = taskData.filter(row=>{
-    const [stt,dateStr,lot,content,quantity]=row.c.map(c=>c?.v);
-    const date = parseTaskDate(dateStr);
-        // ✍️ Thêm dòng này để kiểm tra:
-    console.log("sheet date:", dateStr, "→ parsed:", date,
-                "compare with selected:", selectedDate);
-    return date && date.toDateString()===selectedDate.toDateString();
-  });
+// ----- crop filter buttons
+document.querySelectorAll('[data-crop]').forEach(btn=>btn.addEventListener('click',function(){ drawCrops(this.dataset.crop); }));
 
-  taskListDiv.innerHTML="";
-  const lotTasksMap={};
-
-  dayTasks.forEach(row=>{
-    const [stt,dateStr,lot,content,quantity]=row.c.map(c=>c?.v);
-    if(!lot) return;
-    if(!lotTasksMap[lot]) lotTasksMap[lot]=[];
-    lotTasksMap[lot].push({content,quantity});
-  });
-
-  for(const lot in lotTasksMap){
-    const poly = polygons.find(p=>p.options.name===lot || p.myTooltip?.getContent()?.includes(lot));
-    if(poly){
-      const highlight = L.polygon(poly.getLatLngs(),{color:'red',weight:3,fill:false}).addTo(polygonGroup);
-      highlightLayers.push(highlight);
+// ----- mobile menu open/close
+document.querySelectorAll('#menu button').forEach(btn=>{
+  btn.addEventListener('click', function(e){
+    // xử lý mobile menu open/close
+    if(window.innerWidth<=768){
+      const li = this.parentElement;
+      document.querySelectorAll('#menu button').forEach(item=>{
+         if(item!==li) item.classList.remove('open');
+      });
+      li.classList.toggle('open');
     }
 
-    const tasksHTML = lotTasksMap[lot].map(t=>`- ${t.content} (${t.quantity})`).join("<br>");
-    taskListDiv.innerHTML += `<b>Lô ${lot}</b><br>${tasksHTML}<br><hr>`;
-  }
-}
-
-
-
-// nút “Đóng”: ẩn panel + xóa highlight
-document.getElementById("closeTasksBtn").addEventListener("click",function(){
-  taskPanel.style.display="none";
-  highlightLayers.forEach(l=>polygonGroup.removeLayer(l));
-  highlightLayers=[];
-  taskListDiv.innerHTML="";
+    // nếu KHÔNG phải menu Pháp lý => reset
+    if(!this.textContent.includes('Pháp lý')){
+       resetLegalView();
+    }
+  });
 });
+
+
 };
+function resetLegalView(){
+  console.log('RESET LEGAL VIEW CALLED');
+  ['chkCompanyLegal','chkActualLots','chkDisputed'].forEach(id=>{
+     const el = document.getElementById(id);
+     el.checked = false;
+     el.dispatchEvent(new Event('change')); // <-- quan trọng
+  });
+}
+
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
