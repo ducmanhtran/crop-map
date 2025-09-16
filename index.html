@@ -83,6 +83,19 @@
     visibility:hidden !important;
   }
 }
+    @media (max-width:768px){
+  #menu .submenu{
+    position:relative;      /* đổi từ absolute sang relative để nằm hẳn trong khối menu dọc */
+    z-index:2000;           /* cao hơn cả map và các mục khác */
+    background:#fff;
+    margin-left:0;           /* bỏ canh trái tuyệt đối */
+    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+  }
+  #menu .menu>li.open>.submenu{
+    display:block;          /* hiện submenu khi li có class open */
+  }
+}
+
   </style>
 </head>
 <body>
@@ -432,6 +445,7 @@ window.onload = function () {
 </script>
 </body>
 </html>
+
 
 
 
