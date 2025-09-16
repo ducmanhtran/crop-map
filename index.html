@@ -156,9 +156,9 @@
   </ul>
 </nav>
 
-<div id="map"></div>
+<div id="map"> <div id="infoBox"></div> </div>
 <h2 id="footerTitle">Bản đồ trồng trọt Hòa Phát Quảng Bình</h2>
-<div id="infoBox"></div>
+
 
 <div id="taskPanel" role="dialog" aria-labelledby="taskPanelTitle">
   <div class="panel-header">
@@ -461,10 +461,20 @@ window.onload = function () {
   const is = this.getAttribute('aria-expanded') === 'true';
   this.setAttribute('aria-expanded', !is);
 });
+  // Chọn toàn bộ các link hoặc button trong menu
+  document.querySelectorAll('#menu a, #menu button').forEach(item => {
+  item.addEventListener('click', function () {
+    // Đóng menu hamburger
+    menu.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded','false');
+  });
+});
 };
 </script>
 </body>
 </html>
+
 
 
 
