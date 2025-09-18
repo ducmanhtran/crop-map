@@ -6,117 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <style>
-/* ===== MENU ===== */
-#menu{background:linear-gradient(90deg,#007bff,#0056b3);box-shadow:0 2px 6px rgba(0,0,0,0.25);position:relative;z-index:1000;font-family:Arial,sans-serif}
-#menu .menu{list-style:none;margin:0;padding:0;display:flex;justify-content:center}
-#menu .menu>li{position:relative}
-#menu button{background:none;border:none;padding:14px 20px;font-size:15px;color:#fff;font-weight:600;cursor:pointer;transition:background .3s;display:flex;align-items:center;gap:6px}
-#menu button:hover{background:rgba(0,0,0,0.05);color:#007bff}
-#menu .submenu{display:none;position:absolute;top:100%;left:0;background:#fff;list-style:none;margin:0;padding:6px 0;box-shadow:0 2px 6px rgba(0,0,0,0.25);min-width:200px;border-radius:4px}
-#menu .submenu li{text-align:left}
-#menu .submenu button{width:100%;text-align:left;padding:10px 14px;font-size:14px;color:#333;background:none;border:none}
-#menu .submenu button:hover{background:#f0f0f0;color:#007bff}
-#menu .menu>li:hover>.submenu{display:block}
-#menu .submenu label{font-size:14px;color:#333;display:block;cursor:pointer}
-@media(max-width:768px){
-  /* move info box up for mobile */
-  #infoBox{bottom:80px;left:5px;font-size:13px;padding:6px 10px}
-
-  /* --- HAMBURGER: hiện trên mobile, nền xanh + 3 gạch trắng --- */
-  .hamburger-btn{
-    display:block;
-    position:fixed;      /* ✅ cố định trên màn hình */
-    left:10px; top:8px;
-    z-index:1100;
-    background:#007bff;
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    padding:8px 12px;
-    font-size:22px;
-    cursor:pointer;
-    box-shadow:0 2px 4px rgba(0,0,0,0.3);
-  }
-
-  #menu .menu{
-    /* thêm khoảng trống phía trên để không đè nút */
-    margin-top:60px;      /* ✅ tạo khoảng cách */
-    display:none;
-    grid-template-columns:1fr;
-    grid-gap:4px;
-    padding:8px;
-    border-radius:6px;
-    background:rgba(255,255,255,0.95);
-    box-shadow:0 2px 6px rgba(0,0,0,0.12);
-  }
-    #menu .menu.show{
-    display: grid; /* hoặc block */
-  }
-}
-/* ===== MAP + FOOTER ===== */
-#map{height:calc(100vh - 100px);width:100%;margin:0;padding:0}
-#footerTitle{position:fixed;bottom:0;left:0;width:100%;margin:0;padding:4px 6px;background:rgba(255,255,255,0.85);text-align:center;font-size:13px;box-shadow:0 -1px 4px rgba(0,0,0,0.15);z-index:1000}
-/* ===== LABEL & TOGGLE ===== */
-.custom-label{font-weight:200;font-size:13px;color:#000;text-align:center;white-space:nowrap}
-.toggle-labels-btn{background:#fff;border:1px solid #bbb;border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.15);margin-bottom:40px}
-.toggle-labels-btn:hover{background:#f0f0f0}
-#infoBox{position:fixed;bottom:40px;left:10px;background:rgba(255,255,255,0.9);border:1px solid #ccc;padding:8px 12px;font-size:14px;font-weight:bold;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none}
-/* ===== TASK PANEL ===== */
-#taskPanel{position:fixed;top:60px;right:10px;width:280px;background:rgba(255,255,255,0.95);border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.2);z-index:1200;display:none}
-#taskPanel label{font-weight:bold}
-#taskList{max-height:300px;overflow:auto;font-size:14px;margin-top:6px}
-#taskPanel .task-content{max-height:250px;overflow:auto;padding:10px 14px;font-size:14px;line-height:1.4}
-#taskPanel .date-label{display:block;margin:8px 14px 4px;font-weight:bold}
-#taskDate{width:calc(100% - 28px);margin:0 14px 12px;padding:6px 8px;border:1px solid #ccc;border-radius:6px}
-@media (max-width:768px){
-  #taskPanel{top:10px;left:50%;transform:translateX(-50%);width:80%}
-}
-#taskPanel .panel-header{position:relative;padding-right:35px}
-#closeTasksBtn{position:absolute;top:0;right:0;background:none;border:none;font-size:18px;cursor:pointer;line-height:1}
-.lot-item:hover{cursor:pointer;background:#f9f9f9}
-#menu .submenu li label{font-family:inherit;font-size:14px;font-weight:600;line-height:1.4;display:flex;align-items:center;gap:6px}
-#menu .submenu li label input[type="checkbox"]{transform:scale(1.1);margin:0}
-@media (min-width:769px){
-  .hamburger-btn{
-    display:none !important;
-    visibility:hidden !important;
-  }
-}
-@media (max-width:768px){
-  #menu .submenu{
-    position: static;       /* ❗ không dùng absolute trên mobile */
-    display: none;          /* ẩn mặc định */
-    margin: 0;              /* bỏ margin thừa */
-    padding-left: 12px;     /* tạo khoảng cách lùi vào nếu muốn */
-    background: rgba(255,255,255,0.95);
-    box-shadow: none;       /* bỏ bóng nếu không cần */
-  }
-  /* khi li có class open thì hiện submenu */
-  #menu .menu > li.open > .submenu{
-    display: block;
-  }
-
-  /* có thể tuỳ chỉnh thêm khoảng cách giữa các li */
-  #menu .menu > li{
-    margin-bottom: 4px;
-  }
-  #menu .submenu li button {
-   padding-left: 20px;
-  }
-  #hamburger {
-  color: blue !important;          /* chữ xanh dương mặc định */
-  }
-  #hamburger:hover {
-  color: darkblue !important;
-  }
-  #menu .menu > li > button {
-  color: blue !important;
-  }
-/* Mặc định trên mọi thiết bị */
-
-}
-</style>
+ <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <button class="hamburger-btn" id="hamburger" aria-label="Mở menu" aria-expanded="false">☰</button>
@@ -527,6 +417,7 @@ const menuEl = document.querySelector('#menu .menu');
 </script>
 </body>
 </html>
+
 
 
 
