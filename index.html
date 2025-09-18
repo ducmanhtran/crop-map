@@ -60,8 +60,20 @@
   <input type="date" id="taskDate">
 </div>
   <script src="script.js"></script>
+  <script>
+document.addEventListener('DOMContentLoaded', function(){
+  const btn = document.getElementById('btnHeThongTuoi');
+  console.log('Test nút:', btn);    // ==> F12 phải thấy element
+
+  btn.addEventListener('click', function(){
+     console.log('Đã click nút!');
+     window.location.href = 'he-thong-tuoi.html';
+  });
+});
+</script>
 </body>
 </html>
+
 
 
 
