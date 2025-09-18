@@ -350,4 +350,8 @@ const menuEl = document.querySelector('#menu .menu');
     clearHighlights();
     taskListDiv.innerHTML = '';
   });
+document.getElementById('btnHeThongTuoi').addEventListener('click', function () {
+    // Mở trang mới
+    window.location.href = 'he-thong-tuoi.html';
+});
 };
