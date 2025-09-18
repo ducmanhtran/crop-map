@@ -66,8 +66,6 @@ fetch(SHEET_URL)
         const loai_ong       = r.c[3].v;
         const duong_kinh_mm  = Number(r.c[4].v);
         const toado_polyline = r.c[5].v;
-
-        const toado_polyline = r.c[5].v;   // lấy ô trong sheet
         const latlngs = JSON.parse(toado_polyline);
         
         // Vẽ đường
@@ -90,4 +88,5 @@ fetch(SHEET_URL)
 </script>
 </body>
 </html>
+
 
