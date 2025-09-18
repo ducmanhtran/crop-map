@@ -67,11 +67,9 @@ fetch(SHEET_URL)
         const duong_kinh_mm  = Number(r.c[4].v);
         const toado_polyline = r.c[5].v;
 
-        const latlngs = toado_polyline.split(';').map(p=>{
-          const [lat, lon] = p.split(',').map(Number);
-          return [lat, lon];
-        });
-
+        const toado_polyline = r.c[5].v;   // lấy ô trong sheet
+        const latlngs = JSON.parse(toado_polyline);
+        
         // Vẽ đường
         L.polyline(latlngs, {
           color: loai_duong === 'chinh' ? 'blue' : 'green',
@@ -92,3 +90,4 @@ fetch(SHEET_URL)
 </script>
 </body>
 </html>
+
