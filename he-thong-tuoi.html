@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ thống tưới</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+  body {margin:0;}
+  #map {height:100vh;}
+  /* tái sử dụng menu nếu muốn giống hệt */
+  nav ul {list-style:none;margin:0;padding:0;background:#2d6cdf;display:flex;}
+  nav li {position:relative;}
+  nav a {display:block;padding:10px 15px;color:white;text-decoration:none;}
+  nav li:hover > ul {display:block;}
+  nav ul ul {display:none;position:absolute;top:100%;left:0;background:#2d6cdf;}
+  nav ul ul li {width:180px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <ul id="menu">
+    <li><a href="index.html">Trang chủ</a></li>
+    <li><a href="#">Hạ tầng</a>
+      <ul>
+        <li><a href="he-thong-tuoi.html">Hệ thống tưới</a></li>
+      </ul>
+    </li>
+    <li><a href="#">Cây trồng</a></li>
+  </ul>
+</nav>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+// --- Khởi tạo bản đồ ---
+var map = L.map('map').setView([17.12,106.12], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution:'&copy; OpenStreetMap'
+}).addTo(map);
+
+var dauBepIcon = L.icon({
+    iconUrl: 'dau-bep.png',
+    iconSize: [20,20]
+});
+
+// --- ID Google Sheet ---
+const SHEET_ID = '1-yfsz_JaKXEec14z3ng10q9UgA3BmVTntT5eUq1ItKo';
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json"; 
+
+// --- Đọc và xử lý ---
+fetch(SHEET_URL)
+  .then(res => res.text())
+  .then(text => {
+     // Cắt bỏ hàm bọc ngoài
+     const json = JSON.parse(text.substr(47).slice(0, -2));
+     const rows = json.table.rows;
+
+     rows.forEach(r => {
+        // Các cột theo thứ tự trong sheet
+        const ten_duong      = r.c[0].v;
+        const he_thong       = r.c[1].v;
+        const loai_duong     = r.c[2].v;
+        const loai_ong       = r.c[3].v;
+        const duong_kinh_mm  = Number(r.c[4].v);
+        const toado_polyline = r.c[5].v;
+
+        const latlngs = toado_polyline.split(';').map(p=>{
+          const [lat, lon] = p.split(',').map(Number);
+          return [lat, lon];
+        });
+
+        // Vẽ đường
+        L.polyline(latlngs, {
+          color: loai_duong === 'chinh' ? 'blue' : 'green',
+          weight: duong_kinh_mm/50
+        }).addTo(map)
+          .bindPopup(`<b>${ten_duong}</b><br>
+                      HT: ${he_thong}<br>
+                      Loại ống: ${loai_ong}<br>
+                      ĐK: ${duong_kinh_mm} mm`);
+
+        // Nếu là nhánh => đầu bép cuối
+        if(loai_duong === 'nhanh' && latlngs.length>=2){
+          const lastPoint = latlngs[latlngs.length-1];
+          L.marker(lastPoint, {icon: dauBepIcon}).addTo(map);
+        }
+     });
+  });
+</script>
+</body>
+</html>
