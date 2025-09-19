@@ -255,13 +255,9 @@ window.onload = function () {
 const menuEl = document.querySelector('#menu .menu');
   // Đóng menu và reset bản đồ khi click nút con (mobile + desktop)
 
-  // --- Close task panel ---
-  document.getElementById('closeTasksBtn').addEventListener('click', () => {
-    taskPanel.style.display = 'none';
-    clearHighlights();
-    taskListDiv.innerHTML = '';
-  });
+
 };
+
 
 
 
