@@ -183,7 +183,7 @@ window.onload = function () {
   function clearHighlights() { highlightGroup.clearLayers(); highlightLayers = []; }
   
   // show tasks
-  function showTasks() {
+  window.showTasks = function() {
     if (!taskDateInput.value) return;
     const selectedDate = new Date(taskDateInput.value);
     selectedDate.setHours(0,0,0,0);
@@ -257,6 +257,7 @@ const menuEl = document.querySelector('#menu .menu');
 
 
 };
+
 
 
 
