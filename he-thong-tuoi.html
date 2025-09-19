@@ -54,6 +54,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/1-yfsz_JaKXEec14z3ng10
 fetch(SHEET_URL)
   .then(res => res.text())
   .then(text => {
+    console.log(txt);
      // Cắt bỏ hàm bọc ngoài
      const json = JSON.parse(text.substr(47).slice(0, -2));
      const rows = json.table.rows;
@@ -88,6 +89,7 @@ fetch(SHEET_URL)
 </script>
 </body>
 </html>
+
 
 
 
