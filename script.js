@@ -230,12 +230,7 @@ window.onload = function () {
   window.taskDateInput = document.getElementById('taskDate');
   window.taskListDiv = document.getElementById('taskList');
 
-  document.getElementById('dailyTaskBtn').addEventListener('click', function () {
-    drawCrops('all');
-    if (!anyLegalChecked() && !map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
-    const now = new Date(); const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
-    taskDateInput.value = `${yyyy}-${mm}-${dd}`;
-  });
+
 
   document.getElementById('taskDate').addEventListener('change', function () { if (this.value) updateTaskPanelTitle(new Date(this.value)); showTasks(); });
   document.getElementById('closeTasksBtn').addEventListener('click', function () { taskPanel.style.display = 'none'; clearHighlights(); taskListDiv.innerHTML = ''; });
@@ -284,6 +279,7 @@ const menuEl = document.querySelector('#menu .menu');
     taskListDiv.innerHTML = '';
   });
 };
+
 
 
 
