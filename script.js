@@ -22,7 +22,7 @@ window.onload = function () {
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
 
-  const cropsGroup = L.layerGroup().addTo(map);
+  window.cropsGroup = L.layerGroup().addTo(map);
   const companyLegalGroup = L.layerGroup();
   const actualLotsGroup = L.layerGroup();
   const disputedGroup = L.layerGroup();
@@ -42,7 +42,7 @@ window.onload = function () {
   };
   toggleBtn.addTo(map);
 // --- Helper: Update tiêu đề task panel ---
-  function updateTaskPanelTitle(selectedDate) {
+  window.updateTaskPanelTitle = function(selectedDate) {
     if (!selectedDate) return;
     const today = new Date(); today.setHours(0,0,0,0);
     selectedDate.setHours(0,0,0,0);
@@ -65,7 +65,7 @@ window.onload = function () {
     if (match) return new Date(+match[1], +match[2], +match[3]);
     const d = new Date(str); return isNaN(d) ? null : d;
   }
-  function parseTaskDate(dateStr) { if (!dateStr) return null; const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/); if (m) return new Date(+m[1], +m[2], +m[3]); const d = new Date(dateStr); return isNaN(d) ? null : d; }
+  window.parseTaskDate = function(dateStr) { if (!dateStr) return null; const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/); if (m) return new Date(+m[1], +m[2], +m[3]); const d = new Date(dateStr); return isNaN(d) ? null : d; }
 
   // draw crops
   window.drawCrops = function(filterCrop) {
@@ -170,7 +170,7 @@ window.onload = function () {
     }).catch(err => console.error('Lỗi fetch disputed:', err));
   }
 
-  function anyLegalChecked() {
+  window.anyLegalChecked = function() {
     return document.getElementById('chkCompanyLegal').checked || document.getElementById('chkActualLots').checked || document.getElementById('chkDisputed').checked;
   }
 
@@ -256,7 +256,7 @@ window.onload = function () {
     });
   });
 
-  function resetLegalView() {
+  window.resetLegalView= function() {
     ['chkCompanyLegal', 'chkActualLots', 'chkDisputed'].forEach(id => {
       const el = document.getElementById(id);
       el.checked = false;
@@ -284,6 +284,7 @@ const menuEl = document.querySelector('#menu .menu');
     taskListDiv.innerHTML = '';
   });
 };
+
 
 
 
