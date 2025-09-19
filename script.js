@@ -174,21 +174,7 @@ window.onload = function () {
     return document.getElementById('chkCompanyLegal').checked || document.getElementById('chkActualLots').checked || document.getElementById('chkDisputed').checked;
   }
 
-  // checkbox events
-  document.getElementById('chkCompanyLegal').addEventListener('change', function () {
-    if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawCompanyLegal(); map.addLayer(companyLegalGroup); }
-    else { companyLegalGroup.clearLayers(); map.removeLayer(companyLegalGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
-  });
-  document.getElementById('chkActualLots').addEventListener('change', function () {
-    if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawActualLots(); map.addLayer(actualLotsGroup); }
-    else { actualLotsGroup.clearLayers(); map.removeLayer(actualLotsGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
-  });
-  document.getElementById('chkDisputed').addEventListener('change', function () {
-    if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawDisputedLots(); map.addLayer(disputedGroup); }
-    else { disputedGroup.clearLayers(); map.removeLayer(disputedGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
-  });
-
-  // fetch tasks
+    // fetch tasks
   fetch(sheetTaskUrl).then(res => res.text()).then(data => {
     const match = data.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
     if (match) taskData = JSON.parse(match[1]).table.rows;
@@ -298,5 +284,6 @@ const menuEl = document.querySelector('#menu .menu');
     taskListDiv.innerHTML = '';
   });
 };
+
 
 
