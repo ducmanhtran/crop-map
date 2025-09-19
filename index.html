@@ -25,25 +25,11 @@
   <input type="date" id="taskDate">
 </div>
   <script src="script.js"></script>
-<script>
-  // Nạp file menu.html và chèn vào chỗ placeholder
-fetch('menu.html')
-  .then(res => res.text())
-  .then(html => {
-    document.getElementById('menu-placeholder').innerHTML = html;
-
-    // Sau khi menu đã chèn xong, gắn sự kiện cho nút Hệ thống tưới
-    const btn = document.getElementById('btnHeThongTuoi');
-    if (btn) {
-      btn.addEventListener('click', function () {
-        window.location.href = 'he-thong-tuoi.html';
-      });
-    }
-  });
-</script>
+  <script src="menu-loader.js"></script>
 
 </body>
 </html>
+
 
 
 
