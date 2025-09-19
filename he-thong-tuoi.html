@@ -61,13 +61,30 @@ fetch(SHEET_URL)
 
      rows.forEach(r => {
         // Các cột theo thứ tự trong sheet
-        const ten_duong      = r.c[0].v;
-        const he_thong       = r.c[1].v;
-        const loai_duong     = r.c[2].v;
-        const loai_ong       = r.c[3].v;
-        const duong_kinh_mm  = Number(r.c[4].v);
-        const toado_polyline = r.c[5].v;
-        const latlngs = JSON.parse(toado_polyline);
+        const ten_duong      = r.c[1].v;
+        const he_thong       = r.c[2].v;
+        const loai_duong     = r.c[3].v;
+        const loai_ong       = r.c[4].v;
+        const duong_kinh_mm  = Number(r.c[5].v);
+        const toado_polyline = r.c[6]?.v;   // cột G là index 6, không phải 5
+        if (toado_polyline) {
+            const latlngs = JSON.parse(toado_polyline);
+        
+            L.polyline(latlngs, {
+              color: loai_duong === 'chinh' ? 'blue' : 'green',
+              weight: duong_kinh_mm/50
+            }).addTo(map)
+              .bindPopup(`<b>${ten_duong}</b><br>
+                          HT: ${he_thong}<br>
+                          Loại ống: ${loai_ong}<br>
+                          ĐK: ${duong_kinh_mm} mm`);
+        
+            if(loai_duong === 'nhanh' && latlngs.length>=2){
+              const lastPoint = latlngs[latlngs.length-1];
+              L.marker(lastPoint, {icon: dauBepIcon}).addTo(map);
+            }
+        }
+
         
         // Vẽ đường
         L.polyline(latlngs, {
@@ -89,6 +106,7 @@ fetch(SHEET_URL)
 </script>
 </body>
 </html>
+
 
 
 
