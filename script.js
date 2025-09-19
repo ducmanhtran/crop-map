@@ -293,65 +293,11 @@ window.onload = function () {
 const menuEl = document.querySelector('#menu .menu');
   // Đóng menu và reset bản đồ khi click nút con (mobile + desktop)
 
-
-  // --- Top-level menu ---
-  document.querySelectorAll('#menu .menu > li > button').forEach(topBtn => {
-    topBtn.addEventListener('click', function() {
-      const li = this.parentElement;
-
-      // Mobile: toggle submenu
-      if (window.innerWidth <= 768) {
-        document.querySelectorAll('#menu .menu>li').forEach(item => {
-          if (item !== li) item.classList.remove('open');
-        });
-        li.classList.toggle('open');
-      }
-
-      // Top-level khác Cây trồng: reset pháp lý + show tổng thể
-      if (!this.textContent.includes('Cây trồng')) {
-        resetLegalView();
-        drawCrops('all');
-      }
-    });
-  });
-
-  // --- Submenu items ---
-  document.querySelectorAll('#menu .final-item').forEach(subBtn => {
-    subBtn.addEventListener('click', function() {
-      // Mobile: ẩn menu khi click item
-      if (window.innerWidth <= 768) {
-        menuEl.classList.remove('show');
-        hamburgerBtn.setAttribute('aria-expanded','false');
-      }
-
-      // Submenu cây trồng
-      if (this.dataset.crop) {
-        drawCrops(this.dataset.crop);
-      }
-      // Submenu công việc hàng ngày
-      if (this.id === 'dailyTaskBtn') {
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth()+1).padStart(2,'0');
-        const dd = String(now.getDate()).padStart(2,'0');
-        taskDateInput.value = `${yyyy}-${mm}-${dd}`;
-        updateTaskPanelTitle(new Date(taskDateInput.value));
-        taskDateInput.onchange = () => {console.log('onchange chạy', taskDateInput.value); updateTaskPanelTitle(new Date(taskDateInput.value)); showTasks(); };
-        taskPanel.style.display = 'block';
-        showTasks();
-      }
-    });
-  });
-
-
   // --- Close task panel ---
   document.getElementById('closeTasksBtn').addEventListener('click', () => {
     taskPanel.style.display = 'none';
     clearHighlights();
     taskListDiv.innerHTML = '';
   });
-document.getElementById('btnHeThongTuoi').addEventListener('click', function () {
-    // Mở trang mới
-    window.location.href = 'he-thong-tuoi.html';
-});
 };
+
