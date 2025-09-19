@@ -1,0 +1,36 @@
+<button class="hamburger-btn" id="hamburger" aria-label="Mở menu" aria-expanded="false">☰</button>
+<nav id="menu" aria-label="Main menu">
+  <ul class="menu">
+    <li>
+      <button aria-haspopup="true">🌱 Cây trồng ▾</button>
+      <ul class="submenu">
+        <li><button data-crop="all" class="final-item" >🌍 Tổng thể</button></li>
+        <li><button data-crop="Cỏ" class="final-item">🌱 Cỏ</button></li>
+        <li><button data-crop="Ngô" class="final-item">🌽 Ngô</button></li>
+        <li><button data-crop="Sắn" class="final-item">🥔 Sắn</button></li>
+        <li><button data-crop="Đất trống" class="final-item">⬜ Đất trống</button></li>
+      </ul>
+    </li>
+    <li>
+      <button aria-haspopup="true">🛠️ Công việc ▾</button>
+      <ul class="submenu">
+        <li><button id="dailyTaskBtn" class="final-item">📅 Công việc hàng ngày</button></li>
+      </ul>
+    </li>
+    <li>
+      <button aria-haspopup="true">🏗️ Hạ tầng ▾</button>
+      <ul class="submenu">
+        <li><button id="btnHeThongTuoi" class="final-item">💧 Hệ thống tưới</button></li>
+        <li><button class="final-item">🚜 Máy móc</button></li>
+      </ul>
+    </li>
+    <li>
+      <button aria-haspopup="true">📜 Pháp lý ▾</button>
+      <ul class="submenu">
+        <li><label><input type="checkbox" id="chkCompanyLegal" class="final-item"> Sổ đỏ công ty</label></li>
+        <li><label><input type="checkbox" id="chkActualLots" class="final-item"> Hiện trạng</label></li>
+        <li><label><input type="checkbox" id="chkDisputed" class="final-item"> Đất lấn chiếm</label></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
