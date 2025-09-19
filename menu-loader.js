@@ -75,8 +75,19 @@ fetch('menu.html')
     if (!anyLegalChecked() && !map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
     const now = new Date(); const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
     taskDateInput.value = `${yyyy}-${mm}-${dd}`;
-
-
+  });
+    // checkbox events
+  document.getElementById('chkCompanyLegal').addEventListener('change', function () {
+    if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawCompanyLegal(); map.addLayer(companyLegalGroup); }
+    else { companyLegalGroup.clearLayers(); map.removeLayer(companyLegalGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
+  });
+  document.getElementById('chkActualLots').addEventListener('change', function () {
+    if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawActualLots(); map.addLayer(actualLotsGroup); }
+    else { actualLotsGroup.clearLayers(); map.removeLayer(actualLotsGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
+  });
+  document.getElementById('chkDisputed').addEventListener('change', function () {
+    if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawDisputedLots(); map.addLayer(disputedGroup); }
+    else { disputedGroup.clearLayers(); map.removeLayer(disputedGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
   });
     // --- Kết thúc gắn sự kiện ---
   });
