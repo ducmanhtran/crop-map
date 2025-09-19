@@ -70,5 +70,13 @@ fetch('menu.html')
     if (this.checked) { if (map.hasLayer(cropsGroup)) map.removeLayer(cropsGroup); highlightGroup.clearLayers(); drawDisputedLots(); map.addLayer(disputedGroup); }
     else { disputedGroup.clearLayers(); map.removeLayer(disputedGroup); if (!anyLegalChecked()) map.addLayer(cropsGroup); }
   });
+      document.getElementById('dailyTaskBtn').addEventListener('click', function () {
+    drawCrops('all');
+    if (!anyLegalChecked() && !map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
+    const now = new Date(); const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
+    taskDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+
+  });
     // --- Kết thúc gắn sự kiện ---
   });
