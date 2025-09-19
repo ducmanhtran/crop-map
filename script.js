@@ -68,7 +68,7 @@ window.onload = function () {
   function parseTaskDate(dateStr) { if (!dateStr) return null; const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/); if (m) return new Date(+m[1], +m[2], +m[3]); const d = new Date(dateStr); return isNaN(d) ? null : d; }
 
   // draw crops
-  function drawCrops(filterCrop) {
+  window.drawCrops = function(filterCrop) {
     labelsVisible = false;
     document.querySelector('.toggle-labels-btn').innerHTML = '👁️ Hiện nhãn';
     polygons.forEach(p => { if (p.myTooltip) map.removeLayer(p.myTooltip); });
@@ -241,16 +241,14 @@ window.onload = function () {
 
   // UI elements
   const taskPanel = document.getElementById('taskPanel');
-  const taskDateInput = document.getElementById('taskDate');
-  const taskListDiv = document.getElementById('taskList');
+  window.taskDateInput = document.getElementById('taskDate');
+  window.taskListDiv = document.getElementById('taskList');
 
   document.getElementById('dailyTaskBtn').addEventListener('click', function () {
     drawCrops('all');
     if (!anyLegalChecked() && !map.hasLayer(cropsGroup)) map.addLayer(cropsGroup);
     const now = new Date(); const yyyy = now.getFullYear(); const mm = String(now.getMonth() + 1).padStart(2, '0'); const dd = String(now.getDate()).padStart(2, '0');
     taskDateInput.value = `${yyyy}-${mm}-${dd}`;
-
-
   });
 
   document.getElementById('taskDate').addEventListener('change', function () { if (this.value) updateTaskPanelTitle(new Date(this.value)); showTasks(); });
@@ -300,4 +298,5 @@ const menuEl = document.querySelector('#menu .menu');
     taskListDiv.innerHTML = '';
   });
 };
+
 
