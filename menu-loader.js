@@ -110,5 +110,11 @@ fetch('menu.html')
       if (!this.textContent.includes('Pháp lý')) { resetLegalView(); }
     });
   });
+      // --- Close task panel ---
+  document.getElementById('closeTasksBtn').addEventListener('click', () => {
+    taskPanel.style.display = 'none';
+    clearHighlights();
+    taskListDiv.innerHTML = '';
+  });
     // --- Kết thúc gắn sự kiện ---
   });
