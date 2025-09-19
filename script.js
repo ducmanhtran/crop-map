@@ -232,24 +232,7 @@ window.onload = function () {
 
 
 
-  document.getElementById('taskDate').addEventListener('change', function () { if (this.value) updateTaskPanelTitle(new Date(this.value)); showTasks(); });
-  document.getElementById('closeTasksBtn').addEventListener('click', function () { taskPanel.style.display = 'none'; clearHighlights(); taskListDiv.innerHTML = ''; });
 
-  // crop filter buttons
-  document.querySelectorAll('[data-crop]').forEach(btn => btn.addEventListener('click', function () { drawCrops(this.dataset.crop); }));
-
-  // mobile menu open/close (fixed logic)
-  document.querySelectorAll('#menu button').forEach(btn => {
-    btn.addEventListener('click', function (e) {
-      if (window.innerWidth <= 768) {
-        const li = this.parentElement;
-        document.querySelectorAll('#menu .menu>li').forEach(item => { if (item !== li) item.classList.remove('open'); });
-        li.classList.toggle('open');
-      }
-
-      if (!this.textContent.includes('Pháp lý')) { resetLegalView(); }
-    });
-  });
 
   window.resetLegalView= function() {
     ['chkCompanyLegal', 'chkActualLots', 'chkDisputed'].forEach(id => {
@@ -279,6 +262,7 @@ const menuEl = document.querySelector('#menu .menu');
     taskListDiv.innerHTML = '';
   });
 };
+
 
 
 
