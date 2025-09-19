@@ -19,21 +19,27 @@
 </head>
 <body>
 
-<nav>
-  <ul id="menu">
-    <li><a href="index.html">Trang chủ</a></li>
-    <li><a href="#">Hạ tầng</a>
-      <ul>
-        <li><a href="he-thong-tuoi.html">Hệ thống tưới</a></li>
-      </ul>
-    </li>
-    <li><a href="#">Cây trồng</a></li>
-  </ul>
-</nav>
-
+<div id="menu-placeholder"></div>
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Nạp file menu.html và chèn vào chỗ placeholder
+  fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('menu-placeholder').innerHTML = html;
+
+      // Sau khi menu đã chèn xong, gắn sự kiện cho nút Hệ thống tưới
+      const btn = document.getElementById('btnHeThongTuoi');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          window.location.href = 'he-thong-tuoi.html';
+        });
+      }
+    });
+</script>
+
 <script>
 // --- Khởi tạo bản đồ ---
 var map = L.map('map').setView([17.5089721, 106.4670833], 13);
@@ -106,6 +112,7 @@ fetch(SHEET_URL)
 </script>
 </body>
 </html>
+
 
 
 
